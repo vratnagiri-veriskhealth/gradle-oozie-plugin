@@ -19,8 +19,8 @@ package org.github.mansur.oozie.builders
 import groovy.xml.MarkupBuilder
 
 /**
- * @author Muhammad Ashraf
- * @since 7/24/13
+ * @author Ian Robertson
+ * @since 8/01/13
  */
 class HiveBuilder extends BaseBuilder {
 
