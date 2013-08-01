@@ -5,6 +5,7 @@ import org.github.mansur.oozie.builders.WorkFlowBuilder
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -20,6 +21,7 @@ class OozieWorkflowTask extends DefaultTask {
     @Input HashMap<String, Object> common
     @Input HashMap<String, Object> jobXML
     @Input List<HashMap<String, Object>> workflowActions
+    @Input @Optional LinkedHashMap<String, LinkedHashMap<String, String>> credentials = null
     @Input File outputDir = project.buildDir
 
     OozieWorkflowTask() {
@@ -41,6 +43,7 @@ class OozieWorkflowTask extends DefaultTask {
         wf.jobXML = this.getJobXML()
         wf.actions = getWorkflowActions()
         wf.common = getCommon()
+        wf.credentials = getCredentials()
         def builder = new WorkFlowBuilder()
         generateFlow(builder, wf)
         generateJobXML(builder, wf)

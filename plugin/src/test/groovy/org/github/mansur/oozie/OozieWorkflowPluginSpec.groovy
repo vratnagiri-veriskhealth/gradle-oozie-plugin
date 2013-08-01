@@ -229,4 +229,91 @@ class OozieWorkflowPluginSpec extends Specification {
         xml.exists()
 
     }
+
+    def "Apply oozie with credentials"() {
+        expect:
+        project.tasks.findByName(OozieWorkflowPlugin.TASK_NAME) == null
+
+        when:
+        project.apply plugin: 'oozie'
+
+        project.oozie {
+            def jobTracker = "http://jobtracker"
+            def namenode = "http://namenode"
+
+            def common_props = [
+                    jobTracker: "$jobTracker",
+                    namenode: "$namenode",
+                    jobXML: "dev_prop.xml"
+            ]
+
+            def hive_job = [
+                    cred: "hive-credentials",
+                    name: "hive_job",
+                    type: "hive",
+                    delete: ["${jobTracker}/pattern"],
+                    mainClass: "some.random.class",
+                    jobXML: "job.xml",
+                    ok: "flow_decision",
+                    error: "fail",
+                    configuration: [
+                            "mapred.map.output.compress": "false",
+                            "mapred.job.queue.name": "queuename"
+                    ],
+                    script: "first.hql",
+                    params: [
+                            "--input",
+                            "/cart",
+                            "--output",
+                            "--maxheapSize",
+                            "50"
+                    ]
+            ]
+
+            def fail = [
+                    name: "fail",
+                    type: "kill",
+                    message: "workflow failed!"
+            ]
+
+
+            actions = [
+                    hive_job,
+                    fail]
+
+            common = common_props
+            start = "start_node"
+            end = "end_node"
+            name = 'oozie_flow'
+            namespace = 'uri:oozie:workflow:0.1'
+            credentials = [
+                    "hive-credentials": [
+                      "hcat.metastore.uri": "thrift://localhost:9083/",
+                      "hcat.metastore.principal": "hive/_HOST@DOMAIN"
+                    ],
+                    "other-credentials": [
+                      "hcat.metastore.uri": "thrift://otherhost:9083/",
+                      "hcat.metastore.principal": "hive/_HOST@OTHERDOMAIN"
+                    ],
+            ]
+        }
+
+
+        then:
+        project.extensions.findByName(EXTENSION_NAME) != null
+        Task task = project.tasks.findByName(OozieWorkflowPlugin.TASK_NAME)
+        task.start == "start_node"
+        task.end == "end_node"
+        task.workflowName == 'oozie_flow'
+        task.namespace == 'uri:oozie:workflow:0.1'
+        task.common.size() == 3
+        task.workflowActions.size() == 2
+        task.credentials.size() == 2
+
+        and:
+        task.start()
+        def xml=new File("$project.buildDir/oozie_flow.xml")
+        xml.exists()
+
+    }
 }

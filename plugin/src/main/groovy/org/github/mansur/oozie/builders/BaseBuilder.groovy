@@ -45,6 +45,7 @@ abstract class BaseBuilder {
     public static final String EXEC = 'exec'
     public static final String ENV_VAR = "envVar"
     public static final String MESSAGE = "message"
+    public static final String CRED = "cred"
 
 
     protected HashMap<String, Object> getMergedProperties(HashMap<String, Object> common, HashMap<String, Object> action) {

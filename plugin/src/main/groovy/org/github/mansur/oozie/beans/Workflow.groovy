@@ -16,6 +16,9 @@
 
 package org.github.mansur.oozie.beans
 
+import java.util.Map;
+import java.util.List;
+
 /**
  * @author Muhammad Ashraf
  * @since 7/23/13
@@ -27,5 +30,6 @@ class Workflow {
     String namespace
     HashMap<String, Object> common
     HashMap<String, Object> jobXML
-    List<HashMap<String, Object>> actions
+    List<Map<String, Object>> actions
+    Map<String, Map<String, String>> credentials
 }

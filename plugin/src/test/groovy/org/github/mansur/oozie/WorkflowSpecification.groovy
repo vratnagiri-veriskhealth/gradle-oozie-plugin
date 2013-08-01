@@ -23,6 +23,13 @@ class WorkflowSpecification extends Specification {
                 jobXML: "dev_prop.xml"
         ]
 
+        def credentials = [
+                "hive-credentials": [
+                  "hcat.metastore.uri": "thrift://localhost:9083/",
+                  "hcat.metastore.principal": "hive/_HOST@DOMAIN"
+                ]
+        ]
+
         def shell_to_prod = [
                 name: "shell_to_prod",
                 type: 'shell',
@@ -187,12 +194,53 @@ class WorkflowSpecification extends Specification {
         workflow.end = "end_node"
         workflow.name = 'oozie_flow'
         workflow.namespace = 'uri:oozie:workflow:0.1'
+        workflow.credentials = credentials
 
         def builder = new WorkFlowBuilder()
         def result = builder.buildWorkflow(workflow)
 
+        print result
+
         XMLUnit.setIgnoreWhitespace(true)
         def xmlDiff = new Diff(result, SAMPLE_XML.EXPECTED_FLOW)
+
+        then:
+        xmlDiff.similar()
+    }
+
+    def "Missing Credentials should be no problem"() {
+        when:
+        def jobTracker = "http://jobtracker"
+        def namenode = "http://namenode"
+
+        def common = [
+                jobTracker: "$jobTracker",
+                namenode: "$namenode",
+                jobXML: "dev_prop.xml"
+        ]
+
+        def fail = [
+                name: "fail",
+                type: "kill",
+                message: "workflow failed!"
+        ]
+
+        def actions = [fail]
+        def workflow = new Workflow()
+        workflow.actions = actions
+        workflow.common = common
+        workflow.start = "start_node"
+        workflow.end = "end_node"
+        workflow.name = 'oozie_flow'
+        workflow.namespace = 'uri:oozie:workflow:0.1'
+
+        def builder = new WorkFlowBuilder()
+        def result = builder.buildWorkflow(workflow)
+
+        print result
+
+        XMLUnit.setIgnoreWhitespace(true)
+        def xmlDiff = new Diff(result, SAMPLE_XML.EXPECTED_EMPTY_FLOW)
 
         then:
         xmlDiff.similar()

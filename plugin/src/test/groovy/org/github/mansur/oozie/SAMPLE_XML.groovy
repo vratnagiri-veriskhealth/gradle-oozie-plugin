@@ -7,6 +7,12 @@ package org.github.mansur.oozie
 class SAMPLE_XML {
     def static EXPECTED_FLOW = """
 <workflow-app xmlns='xmlns=uri:oozie:workflow:0.1' name='oozie_flow'>
+  <credentials>
+    <property>
+      <name>hive-credentials</name>
+      <value hcat.metastore.uri='thrift://localhost:9083/' hcat.metastore.principal='hive/_HOST@DOMAIN' />
+    </property>
+  </credentials>
   <start to='start_node' />
   <action name='shell_to_prod'>
     <shell xmlns='uri:oozie:shell-action:0.1'>
@@ -169,6 +175,16 @@ class SAMPLE_XML {
     <ok to='end' />
     <error to='fail' />
   </action>
+  <kill name='fail'>
+    <message>workflow failed!</message>
+  </kill>
+  <end name='end_node' />
+</workflow-app>
+"""
+
+def static EXPECTED_EMPTY_FLOW="""
+<workflow-app xmlns='xmlns=uri:oozie:workflow:0.1' name='oozie_flow'>
+  <start to='start_node' />
   <kill name='fail'>
     <message>workflow failed!</message>
   </kill>

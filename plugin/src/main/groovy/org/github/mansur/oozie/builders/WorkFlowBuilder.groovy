@@ -35,6 +35,7 @@ class WorkFlowBuilder {
             "decision": new DecesionBuilder(),
             "pig": new PigBuilder(),
             "hive": new HiveBuilder(),
+            "credentials": new CredentialsBuilder(),
             "kill": new KillBuilder()
     ]
 
@@ -44,6 +45,16 @@ class WorkFlowBuilder {
         def writer = new StringWriter()
         def workflow = new MarkupBuilder(writer)
         workflow.'workflow-app'('xmlns': "xmlns=$wf.namespace", name: "$wf.name") {
+            if (wf.credentials != null && !wf.credentials.isEmpty()) {
+              credentials {
+                wf.credentials.each { k, v ->
+                  property {
+                    name(k)
+                    value(v)
+                  }
+                }
+              }
+            }
             start(to: wf.start)
             graph.each {
                 def action = findAction(it.toString(), actions)
