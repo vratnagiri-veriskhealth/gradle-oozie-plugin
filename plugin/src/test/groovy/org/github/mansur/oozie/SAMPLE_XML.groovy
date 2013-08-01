@@ -6,7 +6,7 @@ package org.github.mansur.oozie
  */
 class SAMPLE_XML {
     def static EXPECTED_FLOW = """
-<workflow-app xmlns='xmlns=uri:oozie:workflow:0.1' name='oozie_flow'>
+<workflow-app xmlns='uri:oozie:workflow:0.1' name='oozie_flow'>
   <credentials>
     <credential name='hive_credentials' type='hcat'>
       <property>
@@ -125,7 +125,35 @@ class SAMPLE_XML {
     <error to='fail' />
   </action>
   <action name='hive_job'>
-    <hive>
+    <hive xmlns='uri:oozie:hive-action:0.2'>
+      <job-tracker>http://jobtracker</job-tracker>
+      <name-node>http://namenode</name-node>
+      <prepare>
+        <delete path='http://jobtracker/pattern' />
+      </prepare>
+      <job-xml>job.xml</job-xml>
+      <configuration>
+        <property>
+          <name>mapred.map.output.compress</name>
+          <value>false</value>
+        </property>
+        <property>
+          <name>mapred.job.queue.name</name>
+          <value>queuename</value>
+        </property>
+      </configuration>
+      <script>first.hql</script>
+      <param>--input</param>
+      <param>/cart</param>
+      <param>--output</param>
+      <param>--maxheapSize</param>
+      <param>50</param>
+    </hive>
+    <ok to='authenticated_hive_job' />
+    <error to='fail' />
+  </action>
+  <action name='authenticated_hive_job' cred='hive_credentials'>
+    <hive xmlns='uri:oozie:hive-action:0.2'>
       <job-tracker>http://jobtracker</job-tracker>
       <name-node>http://namenode</name-node>
       <prepare>
@@ -189,7 +217,7 @@ class SAMPLE_XML {
 """
 
 def static EXPECTED_EMPTY_FLOW="""
-<workflow-app xmlns='xmlns=uri:oozie:workflow:0.1' name='oozie_flow'>
+<workflow-app xmlns='uri:oozie:workflow:0.1' name='oozie_flow'>
   <start to='start_node' />
   <kill name='fail'>
     <message>workflow failed!</message>

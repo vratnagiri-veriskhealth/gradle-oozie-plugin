@@ -44,7 +44,7 @@ class WorkFlowBuilder {
         def graph = createDAG(actions)
         def writer = new StringWriter()
         def workflow = new MarkupBuilder(writer)
-        workflow.'workflow-app'('xmlns': "xmlns=$wf.namespace", name: "$wf.name") {
+        workflow.'workflow-app'('xmlns': "$wf.namespace", name: "$wf.name") {
             if (wf.credentials != null && !wf.credentials.isEmpty()) {
               credentials {
                 wf.credentials.each { k, v ->
