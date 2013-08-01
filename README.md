@@ -10,15 +10,16 @@ artifactId: gradle-oozie-plugin
 version: 0.1
 ```
 # Supported workflow actions
-Following workflow actions are supported 
+Following workflow actions are supported
 
 1. [java](http://oozie.apache.org/docs/3.3.0/WorkflowFunctionalSpec.html#a3.2.7_Java_Action)
 2. [mapreduce](http://oozie.apache.org/docs/3.3.0/WorkflowFunctionalSpec.html#a3.2.2_Map-Reduce_Action)
 3. [pig](http://oozie.apache.org/docs/3.3.0/WorkflowFunctionalSpec.html#a3.2.3_Pig_Action)
-4. [ssh](http://oozie.apache.org/docs/3.3.0/WorkflowFunctionalSpec.html#a3.2.5_Ssh_Action)
-5. [fs](http://oozie.apache.org/docs/3.3.0/WorkflowFunctionalSpec.html#a3.2.4_Fs_HDFS_action)
-6. [shell](http://oozie.apache.org/docs/3.3.0/DG_ShellActionExtension.html)
-    
+4. [hive](http://oozie.apache.org/docs/3.3.0/DG_HiveActionExtension.html)
+5. [ssh](http://oozie.apache.org/docs/3.3.0/WorkflowFunctionalSpec.html#a3.2.5_Ssh_Action)
+6. [fs](http://oozie.apache.org/docs/3.3.0/WorkflowFunctionalSpec.html#a3.2.4_Fs_HDFS_action)
+7. [shell](http://oozie.apache.org/docs/3.3.0/DG_ShellActionExtension.html)
+
 In addition following decision nodes are also supported
 
  1. [start](http://oozie.apache.org/docs/3.3.0/WorkflowFunctionalSpec.html#a3.1.1_Start_Control_Node)
@@ -26,7 +27,7 @@ In addition following decision nodes are also supported
  3. [kill](http://oozie.apache.org/docs/3.3.0/WorkflowFunctionalSpec.html#a3.1.3_Kill_Control_Node)
  4. [decision](http://oozie.apache.org/docs/3.3.0/WorkflowFunctionalSpec.html#a3.1.4_Decision_Control_Node)
  5. [frok and join](http://oozie.apache.org/docs/3.3.0/WorkflowFunctionalSpec.html#a3.1.5_Fork_and_Join_Control_Nodes)
-    
+
 # Usage
 
 ```grrovy
@@ -97,5 +98,3 @@ first_map_reduce = [
 ```
 
 see [build.gradle](https://github.com/MuhammadAshraf/gradle-oozie-plugin/blob/master/example/build.gradle) and generated [workflow.xml](https://github.com/MuhammadAshraf/gradle-oozie-plugin/blob/master/example/workflow/oozie_flow.xml) for a complete workflow
-
-    
