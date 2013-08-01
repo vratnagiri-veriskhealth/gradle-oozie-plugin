@@ -2,7 +2,7 @@ package org.github.mansur.oozie.builders;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
@@ -54,7 +54,7 @@ public class DirectedGraph {
 
     private void remove(final Node n, final ArrayList<Node> result) {
         result.remove(n);
-        final HashSet<Edge> outEdge = n.outEdge;
+        final LinkedHashSet<Edge> outEdge = n.outEdge;
         for (final Edge edge : outEdge) {
             remove(edge.to, result);
         }
@@ -70,7 +70,7 @@ public class DirectedGraph {
     }
 
     private Node findHead() {
-        final HashSet<Node> nodes = new HashSet<Node>();
+        final LinkedHashSet<Node> nodes = new LinkedHashSet<Node>();
         for (final Node n : this.nodes) {
             if (n.inEdges.size() == 0) {
                 nodes.add(n);
@@ -89,8 +89,8 @@ public class DirectedGraph {
     public static class Node {
         private final String name;
         private final String type;
-        private final HashSet<Edge> inEdges = new HashSet<Edge>();
-        private final HashSet<Edge> outEdge = new HashSet<Edge>();
+        private final LinkedHashSet<Edge> inEdges = new LinkedHashSet<Edge>();
+        private final LinkedHashSet<Edge> outEdge = new LinkedHashSet<Edge>();
 
         public Node(final String name, final String type) {
             this.name = name;
