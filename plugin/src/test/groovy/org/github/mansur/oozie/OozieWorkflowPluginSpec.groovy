@@ -248,7 +248,7 @@ class OozieWorkflowPluginSpec extends Specification {
             ]
 
             def hive_job = [
-                    cred: "hive-credentials",
+                    cred: "hive_credentials",
                     name: "hive_job",
                     type: "hive",
                     delete: ["${jobTracker}/pattern"],
@@ -287,11 +287,11 @@ class OozieWorkflowPluginSpec extends Specification {
             name = 'oozie_flow'
             namespace = 'uri:oozie:workflow:0.1'
             credentials = [
-                    "hive-credentials": [
+                    "hive_credentials": [
                       "hcat.metastore.uri": "thrift://localhost:9083/",
                       "hcat.metastore.principal": "hive/_HOST@DOMAIN"
                     ],
-                    "other-credentials": [
+                    "other_credentials": [
                       "hcat.metastore.uri": "thrift://otherhost:9083/",
                       "hcat.metastore.principal": "hive/_HOST@OTHERDOMAIN"
                     ],

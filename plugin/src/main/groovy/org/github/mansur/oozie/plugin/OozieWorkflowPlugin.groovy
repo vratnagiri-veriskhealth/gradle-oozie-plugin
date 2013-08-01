@@ -32,6 +32,7 @@ class OozieWorkflowPlugin implements Plugin<Project> {
             task.conventionMapping.namespace = { ext.namespace }
             task.conventionMapping.jobXML = { ext.jobXML == null ? [:] : ext.jobXML }
             task.conventionMapping.outputDir = { ext.outputDir == null ? project.buildDir : ext.outputDir }
+            task.conventionMapping.credentials = { ext.credentials }
         }
     }
 }

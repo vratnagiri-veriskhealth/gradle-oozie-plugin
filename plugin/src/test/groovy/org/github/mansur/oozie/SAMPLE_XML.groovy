@@ -8,10 +8,16 @@ class SAMPLE_XML {
     def static EXPECTED_FLOW = """
 <workflow-app xmlns='xmlns=uri:oozie:workflow:0.1' name='oozie_flow'>
   <credentials>
-    <property>
-      <name>hive-credentials</name>
-      <value hcat.metastore.uri='thrift://localhost:9083/' hcat.metastore.principal='hive/_HOST@DOMAIN' />
-    </property>
+    <credential name='hive_credentials' type='hcat'>
+      <property>
+        <name>hcat.metastore.uri</name>
+        <value>thrift://localhost:9083/</value>
+      </property>
+      <property>
+        <name>hcat.metastore.principal</name>
+        <value>hive/_HOST@DOMAIN</value>
+      </property>
+    </credential>
   </credentials>
   <start to='start_node' />
   <action name='shell_to_prod'>

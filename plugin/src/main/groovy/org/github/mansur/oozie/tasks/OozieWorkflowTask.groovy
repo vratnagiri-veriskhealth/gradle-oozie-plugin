@@ -21,7 +21,7 @@ class OozieWorkflowTask extends DefaultTask {
     @Input HashMap<String, Object> common
     @Input HashMap<String, Object> jobXML
     @Input List<HashMap<String, Object>> workflowActions
-    @Input @Optional LinkedHashMap<String, LinkedHashMap<String, String>> credentials = null
+    @Input @Optional LinkedHashMap<String, LinkedHashMap<String, Object>> credentials = null
     @Input File outputDir = project.buildDir
 
     OozieWorkflowTask() {

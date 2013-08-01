@@ -48,9 +48,13 @@ class WorkFlowBuilder {
             if (wf.credentials != null && !wf.credentials.isEmpty()) {
               credentials {
                 wf.credentials.each { k, v ->
-                  property {
-                    name(k)
-                    value(v)
+                  credential(name: k, type: v.get("type")) {
+                    v.get("configuration").each { propertyName, propertyValue ->
+                      property {
+                        name(propertyName)
+                        value(propertyValue)
+                      }
+                    }
                   }
                 }
               }

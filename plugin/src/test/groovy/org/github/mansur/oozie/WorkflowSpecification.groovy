@@ -24,9 +24,12 @@ class WorkflowSpecification extends Specification {
         ]
 
         def credentials = [
-                "hive-credentials": [
-                  "hcat.metastore.uri": "thrift://localhost:9083/",
-                  "hcat.metastore.principal": "hive/_HOST@DOMAIN"
+                "hive_credentials": [
+                  type: "hcat",
+                  configuration: [
+                    "hcat.metastore.uri": "thrift://localhost:9083/",
+                    "hcat.metastore.principal": "hive/_HOST@DOMAIN"
+                  ]
                 ]
         ]
 
@@ -198,8 +201,6 @@ class WorkflowSpecification extends Specification {
 
         def builder = new WorkFlowBuilder()
         def result = builder.buildWorkflow(workflow)
-
-        print result
 
         XMLUnit.setIgnoreWhitespace(true)
         def xmlDiff = new Diff(result, SAMPLE_XML.EXPECTED_FLOW)
