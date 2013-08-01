@@ -109,6 +109,34 @@ class SAMPLE_XML {
       <param>--maxheapSize</param>
       <param>50</param>
     </pig>
+    <ok to='hive_job' />
+    <error to='fail' />
+  </action>
+  <action name='hive_job'>
+    <hive>
+      <job-tracker>http://jobtracker</job-tracker>
+      <name-node>http://namenode</name-node>
+      <prepare>
+        <delete path='http://jobtracker/pattern' />
+      </prepare>
+      <job-xml>job.xml</job-xml>
+      <configuration>
+        <property>
+          <name>mapred.map.output.compress</name>
+          <value>false</value>
+        </property>
+        <property>
+          <name>mapred.job.queue.name</name>
+          <value>queuename</value>
+        </property>
+      </configuration>
+      <script>first.hql</script>
+      <param>--input</param>
+      <param>/cart</param>
+      <param>--output</param>
+      <param>--maxheapSize</param>
+      <param>50</param>
+    </hive>
     <ok to='flow_decision' />
     <error to='fail' />
   </action>

@@ -112,13 +112,35 @@ class WorkflowSpecification extends Specification {
                 delete: ["${jobTracker}/pattern"],
                 mainClass: "some.random.class",
                 jobXML: "job.xml",
-                ok: "flow_decision",
+                ok: "hive_job",
                 error: "fail",
                 configuration: [
                         "mapred.map.output.compress": "false",
                         "mapred.job.queue.name": "queuename"
                 ],
                 script: "first.pig",
+                params: [
+                        "--input",
+                        "/cart",
+                        "--output",
+                        "--maxheapSize",
+                        "50"
+                ]
+        ]
+
+        def hive_job = [
+                name: "hive_job",
+                type: "hive",
+                delete: ["${jobTracker}/pattern"],
+                mainClass: "some.random.class",
+                jobXML: "job.xml",
+                ok: "flow_decision",
+                error: "fail",
+                configuration: [
+                        "mapred.map.output.compress": "false",
+                        "mapred.job.queue.name": "queuename"
+                ],
+                script: "first.hql",
                 params: [
                         "--input",
                         "/cart",
@@ -157,7 +179,7 @@ class WorkflowSpecification extends Specification {
                 message: "workflow failed!"
         ]
 
-        def actions = [shell_to_prod, move_files, mahout_pfpgrowth, fork_flow, join_flow, pig_job, first_map_reduce, flow_decision, fail]
+        def actions = [shell_to_prod, move_files, mahout_pfpgrowth, fork_flow, join_flow, pig_job, hive_job, first_map_reduce, flow_decision, fail]
         def workflow = new Workflow()
         workflow.actions = actions
         workflow.common = common

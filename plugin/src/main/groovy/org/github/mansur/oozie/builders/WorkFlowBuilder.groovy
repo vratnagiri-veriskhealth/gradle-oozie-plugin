@@ -34,6 +34,7 @@ class WorkFlowBuilder {
             "join": new JoinBuilder(),
             "decision": new DecesionBuilder(),
             "pig": new PigBuilder(),
+            "hive": new HiveBuilder(),
             "kill": new KillBuilder()
     ]
 
