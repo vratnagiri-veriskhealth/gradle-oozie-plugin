@@ -37,7 +37,7 @@ class HiveBuilder extends BaseBuilder {
                 addNode(map, xml, 'name-node', NAME_NODE)
                 addPrepareNodes(xml, (List<String>) map.get(DELETE), (List<String>) map.get(MKDIR))
                 addNode(map, xml, 'job-xml', JOB_XML)
-                if (map.containsKey(CONFIGURATION)) {
+                if (map.containsKey(CONFIGURATION) && ! map.get(CONFIGURATION).isEmpty()) {
                   xml.configuration { addConfiguration(xml, map) }
                 }
                 addNode(map, xml, SCRIPT, SCRIPT)
