@@ -163,6 +163,17 @@ class OozieWorkflowPluginSpec extends Specification {
                     ]
             ]
 
+            def email_job = [
+                    name: "email_job",
+                    type: "email",
+                    to: "recipient@mail.com",
+                    cc: "also@mail.com",
+                    subject: "vasal",
+                    body: "bow down",
+                    ok: "flow_decision",
+                    error: "fail",
+            ]
+
             def first_map_reduce = [
                     name: "first_map_reduce",
                     type: "mapreduce",

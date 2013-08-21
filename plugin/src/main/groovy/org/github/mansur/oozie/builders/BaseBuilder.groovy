@@ -46,6 +46,10 @@ abstract class BaseBuilder {
     public static final String ENV_VAR = "envVar"
     public static final String MESSAGE = "message"
     public static final String CRED = "cred"
+    public static final String TO = "to"
+    public static final String CC = "cc"
+    public static final String SUBJECT = "subject"
+    public static final String BODY = "body"
 
 
     protected HashMap<String, Object> getMergedProperties(HashMap<String, Object> common, HashMap<String, Object> action) {

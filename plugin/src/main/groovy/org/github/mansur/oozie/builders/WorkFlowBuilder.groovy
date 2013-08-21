@@ -35,6 +35,7 @@ class WorkFlowBuilder {
             "decision": new DecesionBuilder(),
             "pig": new PigBuilder(),
             "hive": new HiveBuilder(),
+            "email": new EmailBuilder(),
             "kill": new KillBuilder()
     ]
 
