@@ -1,6 +1,7 @@
 package org.github.mansur.oozie
 
 import org.github.mansur.oozie.plugin.OozieWorkflowPlugin
+import org.github.mansur.oozie.tasks.OozieWorkflowTask;
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.testfixtures.ProjectBuilder
@@ -13,6 +14,8 @@ import spock.lang.Specification
 class OozieWorkflowPluginSpec extends Specification {
 
     static final String EXTENSION_NAME = 'oozie'
+    static final String TASK_NAME = 'oozieTask'
+
     Project project
 
     def setup() {
@@ -21,7 +24,7 @@ class OozieWorkflowPluginSpec extends Specification {
 
     def "Apply oozie plugin"() {
         expect:
-        project.tasks.findByName(OozieWorkflowPlugin.TASK_NAME) == null
+        project.tasks.findByName(TASK_NAME) == null
 
         when:
         project.apply plugin: 'oozie'
@@ -223,10 +226,11 @@ class OozieWorkflowPluginSpec extends Specification {
             namespace = 'uri:oozie:workflow:0.1'
         }
 
+        project.task(TASK_NAME, type: OozieWorkflowTask)
 
         then:
         project.extensions.findByName(EXTENSION_NAME) != null
-        Task task = project.tasks.findByName(OozieWorkflowPlugin.TASK_NAME)
+        Task task = project.tasks.findByName(TASK_NAME)
         task.start == "start_node"
         task.end == "end_node"
         task.workflowName == 'oozie_flow'
@@ -243,7 +247,7 @@ class OozieWorkflowPluginSpec extends Specification {
 
     def "Apply oozie with credentials"() {
         expect:
-        project.tasks.findByName(OozieWorkflowPlugin.TASK_NAME) == null
+        project.tasks.findByName(TASK_NAME) == null
 
         when:
         project.apply plugin: 'oozie'
@@ -309,10 +313,11 @@ class OozieWorkflowPluginSpec extends Specification {
             ]
         }
 
+        project.task(TASK_NAME, type: OozieWorkflowTask)
 
         then:
         project.extensions.findByName(EXTENSION_NAME) != null
-        Task task = project.tasks.findByName(OozieWorkflowPlugin.TASK_NAME)
+        Task task = project.tasks.findByName(TASK_NAME)
         task.start == "start_node"
         task.end == "end_node"
         task.workflowName == 'oozie_flow'

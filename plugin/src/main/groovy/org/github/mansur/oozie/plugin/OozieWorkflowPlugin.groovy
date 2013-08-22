@@ -12,13 +12,11 @@ import org.gradle.api.Project
 class OozieWorkflowPlugin implements Plugin<Project> {
 
     static final String EXTENSION_NAME = 'oozie'
-    public static final TASK_NAME = "oozieWorkflow"
 
     @Override
     void apply(Project project) {
         project.extensions.create(EXTENSION_NAME, OozieWorkflowExtension)
         addTask(project)
-        project.task(TASK_NAME, type: OozieWorkflowTask)
     }
 
     private void addTask(Project project) {
