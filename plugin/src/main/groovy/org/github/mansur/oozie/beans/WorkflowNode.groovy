@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.Map;
 
 abstract class WorkflowNode implements Serializable {
+  private static final long serialVersionUID = 1L
+
   String name
   String type
 

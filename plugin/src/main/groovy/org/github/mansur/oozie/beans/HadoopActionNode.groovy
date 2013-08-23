@@ -3,6 +3,8 @@ package org.github.mansur.oozie.beans
 import java.util.Map
 
 abstract class HadoopActionNode extends ActionNode {
+  private static final long serialVersionUID = 1L
+
   String jobTracker
   String nameNode
   String jobXml

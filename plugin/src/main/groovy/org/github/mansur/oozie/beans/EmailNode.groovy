@@ -27,6 +27,8 @@ import java.util.List;
  * @since 7/23/13
  */
 class EmailNode extends ActionNode {
+  private static final long serialVersionUID = 1L
+
   EmailNode() { type='email' }
   String to
   String cc
