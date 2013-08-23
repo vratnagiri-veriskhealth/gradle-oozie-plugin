@@ -94,7 +94,7 @@ class WorkFlowBuilder {
      * @param actions
      * @return
      */
-    private List<DirectedGraph.Node> createDAG(List<HashMap<String, Object>> actions) {
+    private List<DirectedGraph.Node> createDAG(List<Object> actions) {
         def graph = new DirectedGraph();
         HashMap<String, DirectedGraph.Node> nodesMap = getNodeMap(actions)
         def nodes = nodesMap.values()
@@ -153,8 +153,11 @@ class WorkFlowBuilder {
         }
     }
 
-    private HashMap<String, Object> findAction(String name, List<HashMap<String, Object>> actions) {
-        actions.find { name == it.get("name") }
+    private Map asMap(Object o) {
+      return o instanceof Map ? o : o.toMap();
+    }
+    private Map<String, Object> findAction(String name, List<Object> actions) {
+        asMap(actions.find { name == asMap(it).get("name") })
     }
 
     def Object findBuilder(String type) {
@@ -165,9 +168,10 @@ class WorkFlowBuilder {
         builder
     }
 
-    private HashMap<String, DirectedGraph.Node> getNodeMap(List<HashMap<String, Object>> actions) {
+    private HashMap<String, DirectedGraph.Node> getNodeMap(List<Object> actions) {
         def nodesMap = new HashMap<String, DirectedGraph.Node>()
         actions.each {
+            it = asMap(it)
             String name = it.get("name")
             def type = it.get("type")
             if (name == null || name.length() <= 0) {

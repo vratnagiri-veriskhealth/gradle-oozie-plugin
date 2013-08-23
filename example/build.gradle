@@ -17,7 +17,6 @@ buildscript {
 apply plugin: 'java'
 apply plugin: 'oozie'
 
-
 oozie {
     def jobTracker = "http://jobtracker"
     def namenode = "http://namenode"
@@ -190,3 +189,5 @@ oozie {
     jobXML = comong_configs
     outputDir = file("$projectDir/workflow")
 }
+
+task oozieWorkflow(type: org.github.mansur.oozie.tasks.OozieWorkflowTask)

@@ -2,8 +2,12 @@ package org.github.mansur.oozie.plugin
 
 import org.github.mansur.oozie.extensions.OozieWorkflowExtension
 import org.github.mansur.oozie.tasks.OozieWorkflowTask
+import org.github.mansur.oozie.beans.EmailNode
+import org.github.mansur.oozie.beans.HiveNode;
+import org.github.mansur.oozie.beans.KillNode
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+
 
 /**
  * @author Muhammad Ashraf
@@ -15,8 +19,11 @@ class OozieWorkflowPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        project.extensions.create(EXTENSION_NAME, OozieWorkflowExtension)
-        addTask(project)
+      project.extensions.create(EXTENSION_NAME, OozieWorkflowExtension)
+      addTask(project)
+      project.metaClass.oozieHive= { params -> new HiveNode(params) }
+      project.metaClass.oozieEmail= { params -> new EmailNode(params) }
+      project.metaClass.oozieKill= { params -> new KillNode(params) }
     }
 
     private void addTask(Project project) {

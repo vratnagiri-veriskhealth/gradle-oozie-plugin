@@ -20,7 +20,7 @@ class OozieWorkflowTask extends DefaultTask {
     @Input String namespace = 'uri:oozie:workflow:0.1'
     @Input HashMap<String, Object> common
     @Input HashMap<String, Object> jobXML
-    @Input List<HashMap<String, Object>> workflowActions
+    @Input List<Object> workflowActions
     @Input @Optional LinkedHashMap<String, LinkedHashMap<String, Object>> credentials = null
     @Input File outputDir = project.buildDir
 
