@@ -31,7 +31,6 @@ class OozieWorkflowPlugin implements Plugin<Project> {
             def ext = project.extensions.findByName(EXTENSION_NAME)
             task.conventionMapping.workflowActions = { ext.actions }
             task.conventionMapping.common = { ext.common == null ? [:] : ext.common }
-            task.conventionMapping.start = { ext.start }
             task.conventionMapping.end = { ext.end }
             task.conventionMapping.workflowName = { ext.name }
             task.conventionMapping.namespace = { ext.namespace }

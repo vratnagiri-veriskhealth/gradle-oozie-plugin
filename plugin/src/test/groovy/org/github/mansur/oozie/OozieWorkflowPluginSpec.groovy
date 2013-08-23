@@ -220,7 +220,6 @@ class OozieWorkflowPluginSpec extends Specification {
                     fail]
 
             common = common_props
-            start = "start_node"
             end = "end_node"
             name = 'oozie_flow'
             namespace = 'uri:oozie:workflow:0.1'
@@ -231,7 +230,6 @@ class OozieWorkflowPluginSpec extends Specification {
         then:
         project.extensions.findByName(EXTENSION_NAME) != null
         Task task = project.tasks.findByName(TASK_NAME)
-        task.start == "start_node"
         task.end == "end_node"
         task.workflowName == 'oozie_flow'
         task.namespace == 'uri:oozie:workflow:0.1'
@@ -297,7 +295,6 @@ class OozieWorkflowPluginSpec extends Specification {
                     fail]
 
             common = common_props
-            start = "start_node"
             end = "end_node"
             name = 'oozie_flow'
             namespace = 'uri:oozie:workflow:0.1'
@@ -318,7 +315,6 @@ class OozieWorkflowPluginSpec extends Specification {
         then:
         project.extensions.findByName(EXTENSION_NAME) != null
         Task task = project.tasks.findByName(TASK_NAME)
-        task.start == "start_node"
         task.end == "end_node"
         task.workflowName == 'oozie_flow'
         task.namespace == 'uri:oozie:workflow:0.1'

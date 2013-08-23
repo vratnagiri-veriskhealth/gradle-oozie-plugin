@@ -59,8 +59,8 @@ class WorkFlowBuilder {
                 }
               }
             }
-            start(to: wf.start)
-            graph.each {
+            start(to: graph.findHead())
+            graph.sort().each {
                 def action = findAction(it.toString(), actions)
                 def type = action.get("type")
                 def builder = findBuilder(type)
@@ -94,7 +94,7 @@ class WorkFlowBuilder {
      * @param actions
      * @return
      */
-    private List<DirectedGraph.Node> createDAG(List<Object> actions) {
+    private DirectedGraph createDAG(List<Object> actions) {
         def graph = new DirectedGraph();
         HashMap<String, DirectedGraph.Node> nodesMap = getNodeMap(actions)
         def nodes = nodesMap.values()
@@ -122,7 +122,7 @@ class WorkFlowBuilder {
             }
             graph.addNode(n)
         }
-        graph.sort()
+        graph
     }
 
     private void handleDecision(HashMap<String, Object> action, HashMap<String, DirectedGraph.Node> nodesMap, n) {

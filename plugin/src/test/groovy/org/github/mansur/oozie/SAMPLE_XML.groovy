@@ -19,7 +19,7 @@ class SAMPLE_XML {
       </property>
     </credential>
   </credentials>
-  <start to='start_node' />
+  <start to='shell_to_prod' />
   <action name='shell_to_prod'>
     <shell xmlns='uri:oozie:shell-action:0.1'>
       <job-tracker>http://jobtracker</job-tracker>
@@ -218,7 +218,7 @@ class SAMPLE_XML {
 
 def static EXPECTED_EMPTY_FLOW="""
 <workflow-app xmlns='uri:oozie:workflow:0.1' name='oozie_flow'>
-  <start to='start_node' />
+  <start to='fail' />
   <kill name='fail'>
     <message>workflow failed!</message>
   </kill>

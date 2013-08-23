@@ -25,7 +25,6 @@ import java.util.List;
  */
 class Workflow {
     String name
-    String start
     String end
     String namespace
     HashMap<String, Object> common

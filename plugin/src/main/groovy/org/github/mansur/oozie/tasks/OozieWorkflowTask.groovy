@@ -15,7 +15,6 @@ import org.gradle.api.tasks.TaskAction
 class OozieWorkflowTask extends DefaultTask {
 
     @Input String workflowName
-    @Input String start
     @Input String end
     @Input String namespace = 'uri:oozie:workflow:0.1'
     @Input HashMap<String, Object> common
@@ -37,7 +36,6 @@ class OozieWorkflowTask extends DefaultTask {
     private void generateWorkflow() {
         def wf = new Workflow()
         wf.name = getWorkflowName()
-        wf.start = getStart()
         wf.end = getEnd()
         wf.namespace = getNamespace()
         wf.jobXML = this.getJobXML()

@@ -69,7 +69,7 @@ public class DirectedGraph {
         }
     }
 
-    private Node findHead() {
+    Node findHead() {
         final LinkedHashSet<Node> nodes = new LinkedHashSet<Node>();
         for (final Node n : this.nodes) {
             if (n.inEdges.size() == 0) {

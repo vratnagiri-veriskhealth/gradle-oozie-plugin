@@ -8,7 +8,6 @@ import java.util.Map;
  */
 class OozieWorkflowExtension {
     String name
-    String start
     String end
     String namespace
     HashMap<String, Object> common

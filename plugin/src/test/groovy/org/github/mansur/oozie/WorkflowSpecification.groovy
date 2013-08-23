@@ -216,7 +216,6 @@ class WorkflowSpecification extends Specification {
         def workflow = new Workflow()
         workflow.actions = actions
         workflow.common = common
-        workflow.start = "start_node"
         workflow.end = "end_node"
         workflow.name = 'oozie_flow'
         workflow.namespace = 'uri:oozie:workflow:0.1'
@@ -253,7 +252,6 @@ class WorkflowSpecification extends Specification {
         def workflow = new Workflow()
         workflow.actions = actions
         workflow.common = common
-        workflow.start = "start_node"
         workflow.end = "end_node"
         workflow.name = 'oozie_flow'
         workflow.namespace = 'uri:oozie:workflow:0.1'
