@@ -188,7 +188,7 @@ class WorkflowSpecification extends Specification {
                 type: "mapreduce",
                 delete: ["${jobTracker}/pattern"],
                 jobXML: "job.xml",
-                ok: "end",
+                ok: "end_node",
                 error: "fail",
                 configuration: [
                         "mapred.map.output.compress": "false",
@@ -200,10 +200,10 @@ class WorkflowSpecification extends Specification {
                 name: "flow_decision",
                 type: "decision",
                 switch: [
-                        [to: "end", if: "some condition"],
+                        [to: "end_node", if: "some condition"],
                         [to: "first_map_reduce", if: "some other condition"]
                 ],
-                default: "end"
+                default: "end_node"
         ]
 
         def fail = [

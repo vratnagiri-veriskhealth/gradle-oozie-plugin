@@ -17,6 +17,7 @@
 package org.github.mansur.oozie.builders
 
 import groovy.xml.MarkupBuilder
+
 import org.github.mansur.oozie.beans.Workflow
 
 /**
@@ -41,7 +42,7 @@ class WorkFlowBuilder {
 
     def String buildWorkflow(Workflow wf) {
         def actions = wf.actions
-        def graph = createDAG(actions)
+        def graph = createDAG(actions, wf.end)
         def writer = new StringWriter()
         def workflow = new MarkupBuilder(writer)
         workflow.'workflow-app'('xmlns': "$wf.namespace", name: "$wf.name") {
@@ -94,67 +95,98 @@ class WorkFlowBuilder {
      * @param actions
      * @return
      */
-    private DirectedGraph createDAG(List<Object> actions) {
+    private DirectedGraph createDAG(List<Object> actions, String endName) {
         def graph = new DirectedGraph();
-        HashMap<String, DirectedGraph.Node> nodesMap = getNodeMap(actions)
+        Map<String, DirectedGraph.Node> nodesMap = getNodeMap(actions)
         def nodes = nodesMap.values()
         nodes.each { n ->
             def nodeName = n.toString()
+            if (nodeName == endName) {
+              return;
+            }
             def action = findAction(nodeName, actions)
             def type = action.get("type")
             if (type == "fork") {
                 handleFork(action, nodesMap, n)
             } else if (type == "join") {
-                handleJoin(action, nodesMap, n)
+                handleJoin(action, nodesMap, n, endName)
             } else if (type == "decision") {
-                handleDecision(action, nodesMap, n)
-            } else {
-                def toNodeName = action.get("ok")
-                def toNode = nodesMap.get(toNodeName)
-                if (toNode != null) {
-                    n.addEdge(toNode)
+                handleDecision(action, nodesMap, n, endName)
+            } else if (type != "kill") {
+                def okNodeName = action.get("ok")
+                def okNode = nodesMap.get(okNodeName)
+                if (okNode != null) {
+                    n.addEdge(okNode)
                 }
-                def fail = action.get("error")
-                def failNode = nodesMap.get(fail)
+                else if (okNodeName != endName) {
+                  throw new IllegalStateException("node " + n.name + " maps ok to non-existant node " + okNodeName);
+                }
+                def failNodeName = action.get("error")
+                def failNode = nodesMap.get(failNodeName)
                 if (failNode != null) {
                     n.addEdge(failNode)
+                }
+                else if (failNodeName != endName) {
+                  throw new IllegalStateException("node " + n.name + " maps fail to non-existant node " + failNodeName);
                 }
             }
             graph.addNode(n)
         }
-        graph
+        return graph
     }
 
-    private void handleDecision(HashMap<String, Object> action, HashMap<String, DirectedGraph.Node> nodesMap, n) {
+    private void handleDecision(
+      Map<String, Object> action, Map<String, DirectedGraph.Node> nodesMap, DirectedGraph.Node n, String endName) {
         action.get("switch")?.each { c ->
             def to = c.get("to")
             def toNode = nodesMap.get(to)
             if (toNode != null) {
                 n.addEdge(toNode)
             }
+            else if (to != endName) {
+              throw new IllegalStateException("decision node " + n.name + " maps to non-existant node " + to);
+            }
+        }
+        String defaultTargetName = action.get("default");
+        if (defaultTargetName != null) {
+          def defaultTarget = nodesMap.get(defaultTargetName);
+          if (defaultTarget != null) {
+            n.addEdge(defaultTarget);
+          }
+          else if (defaultTargetName != endName) {
+            throw new IllegalStateException(
+              "decision node " + n.name + " defaults to non-existant node " + defaultTargetName);
+          }
         }
     }
 
-    private void handleJoin(HashMap<String, Object> action, HashMap<String, DirectedGraph.Node> nodesMap, DirectedGraph.Node n) {
+    private void handleJoin(
+      Map<String, Object> action, Map<String, DirectedGraph.Node> nodesMap, DirectedGraph.Node n, String endName) {
         def to = action.get("to")
         def toNode = nodesMap.get(to)
         if (toNode != null) {
             n.addEdge(toNode)
         }
+        else if (to != endName) {
+          throw new IllegalStateException("join node " + n.name + " forwards to non-existant node " + to);
+        }
     }
 
-    private void handleFork(HashMap<String, Object> action, HashMap<String, DirectedGraph.Node> nodesMap, n) {
+    private void handleFork(Map<String, Object> action, Map<String, DirectedGraph.Node> nodesMap, n) {
         def paths = action.get("paths")
         paths?.each { p ->
             def toNode = nodesMap.get(p)
             if (toNode != null) {
                 n.addEdge(toNode)
             }
+            else {
+              throw new IllegalStateException("node " + n.name + " forks to non-existant node " + p);
+            }
         }
     }
 
     private Map asMap(Object o) {
-      return o instanceof Map ? o : o.toMap();
+      return (o instanceof Map || o == null) ? o : o.toMap();
     }
     private Map<String, Object> findAction(String name, List<Object> actions) {
         asMap(actions.find { name == asMap(it).get("name") })

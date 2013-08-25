@@ -182,9 +182,9 @@ class SAMPLE_XML {
   </action>
   <decision name='flow_decision'>
     <switch>
-      <case to='end'>some condition</case>
+      <case to='end_node'>some condition</case>
       <case to='first_map_reduce'>some other condition</case>
-      <default to='end' />
+      <default to='end_node' />
     </switch>
   </decision>
   <action name='first_map_reduce'>
@@ -206,7 +206,7 @@ class SAMPLE_XML {
         </property>
       </configuration>
     </map-reduce>
-    <ok to='end' />
+    <ok to='end_node' />
     <error to='fail' />
   </action>
   <kill name='fail'>
