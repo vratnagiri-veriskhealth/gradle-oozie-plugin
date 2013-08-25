@@ -21,8 +21,6 @@ import org.github.mansur.oozie.builders.DirectedGraph.Node;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -36,27 +34,27 @@ public class DirectedGraphTest {
 
     @Test
     public void testSort() throws Exception {
-        final DirectedGraph.Node node1 = new DirectedGraph.Node("node1", "typeo");
-        final DirectedGraph.Node node2 = new DirectedGraph.Node("node2", "type");
-        final DirectedGraph.Node node3 = new DirectedGraph.Node("node3", "type");
-        final DirectedGraph.Node node4 = new DirectedGraph.Node("node4", "type");
+        final DirectedGraph.Node node1 = new DirectedGraph.Node("node1");
+        final DirectedGraph.Node node2 = new DirectedGraph.Node("node2");
+        final DirectedGraph.Node node3 = new DirectedGraph.Node("node3");
+        final DirectedGraph.Node node4 = new DirectedGraph.Node("node4");
         node1.addEdge(node2);
         node2.addEdge(node3);
         node3.addEdge(node4);
 
         final DirectedGraph directedGraph = new DirectedGraph();
         directedGraph.addNodes(node2, node1, node3, node4);
-        final List<DirectedGraph.Node> sortedGraph = directedGraph.sort();
+        final List<DirectedGraph.Node> sortedGraph = directedGraph.tSort();
         assertThat(sortedGraph).containsExactly(node1, node2, node3, node4);
     }
 
     @Test
     public void testOneNodeFlow() throws Exception {
-        final DirectedGraph.Node node1 = new DirectedGraph.Node("node1", "type");
+        final DirectedGraph.Node node1 = new DirectedGraph.Node("node1");
 
         final DirectedGraph directedGraph = new DirectedGraph();
         directedGraph.addNodes(node1);
-        final List<DirectedGraph.Node> sortedGraph = directedGraph.sort();
+        final List<DirectedGraph.Node> sortedGraph = directedGraph.tSort();
         assertThat(sortedGraph).containsExactly(node1);
 
     }
@@ -65,7 +63,7 @@ public class DirectedGraphTest {
     public void testNonCyclic() {
       List<DirectedGraph.Node> nodes = new ArrayList<>();
       for (int i = 0; i < 4; i++) {
-        DirectedGraph.Node node = new DirectedGraph.Node("node" + i, "type");
+        DirectedGraph.Node node = new DirectedGraph.Node("node" + i);
         for (Node n : nodes) {
           n.addEdge(node);
         }
@@ -76,16 +74,16 @@ public class DirectedGraphTest {
       dag.addNode(nodes.get(1));
       dag.addNode(nodes.get(2));
       dag.addNode(nodes.get(3));
-      List<Node> sorted = dag.sort();
+      List<Node> sorted = dag.tSort();
       assertEquals(nodes, sorted);
     }
 
     @Test
     public void testDiamondDag() {
-      Node start = new Node("root", "type");
-      Node left = new Node("left", "type");
-      Node right = new Node("right", "type");
-      Node end = new Node("end", "type");
+      Node start = new Node("root");
+      Node left = new Node("left");
+      Node right = new Node("right");
+      Node end = new Node("end");
       start.addEdge(left);
       start.addEdge(right);
       left.addEdge(end);
@@ -96,7 +94,7 @@ public class DirectedGraphTest {
       dag.addNode(right);
       dag.addNode(end);
 
-      List<Node> sorted = dag.sort();
+      List<Node> sorted = dag.tSort();
       assertEquals(4, sorted.size());
       assertEquals(start, sorted.get(0));
       assertEquals(end, sorted.get(3));
@@ -104,30 +102,30 @@ public class DirectedGraphTest {
 
     @Test(expected = IllegalStateException.class)
     public void testMultipleHeads() throws Exception {
-        final DirectedGraph.Node node1 = new DirectedGraph.Node("node1", "type");
-        final DirectedGraph.Node node2 = new DirectedGraph.Node("node2", "type");
-        final DirectedGraph.Node node3 = new DirectedGraph.Node("node3", "type");
-        final DirectedGraph.Node node4 = new DirectedGraph.Node("node4", "type");
+        final DirectedGraph.Node node1 = new DirectedGraph.Node("node1");
+        final DirectedGraph.Node node2 = new DirectedGraph.Node("node2");
+        final DirectedGraph.Node node3 = new DirectedGraph.Node("node3");
+        final DirectedGraph.Node node4 = new DirectedGraph.Node("node4");
         node2.addEdge(node3);
         node3.addEdge(node4);
 
         final DirectedGraph directedGraph = new DirectedGraph();
         directedGraph.addNodes(node2, node1, node3, node4);
-        directedGraph.sort();
+        directedGraph.tSort();
     }
 
     @Test(expected = IllegalStateException.class)
     public void testCyclicGraph() throws Exception {
-        final DirectedGraph.Node node1 = new DirectedGraph.Node("node1", "type");
-        final DirectedGraph.Node node2 = new DirectedGraph.Node("node2", "type");
-        final DirectedGraph.Node node3 = new DirectedGraph.Node("node3", "type");
+        final DirectedGraph.Node node1 = new DirectedGraph.Node("node1");
+        final DirectedGraph.Node node2 = new DirectedGraph.Node("node2");
+        final DirectedGraph.Node node3 = new DirectedGraph.Node("node3");
         node1.addEdge(node2);
         node2.addEdge(node3);
         node3.addEdge(node2);
 
         final DirectedGraph directedGraph = new DirectedGraph();
         directedGraph.addNodes(node2, node1, node3);
-        directedGraph.sort();
+        directedGraph.tSort();
 
     }
 }

@@ -2,8 +2,10 @@ package org.github.mansur.oozie.builders;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Muhammad Ashraf
@@ -25,48 +27,39 @@ public class DirectedGraph {
         Collections.addAll(this.nodes, nodes);
     }
 
-    public List<Node> sort() {
-        // Empty list that will contain the sorted elements
-        final ArrayList<Node> result = new ArrayList<Node>();
-        final Node head = findHead();
-        add(head, result);
-        return result;
+
+    /**
+     * Topoligically sort the nodes, so that any node only points to nodes later in the list.
+     * Note that this algorithm is destructive to the graph; when done, edges will be gone.
+     * @return a topoligically sorted list of the nodes
+     */
+    public List<Node> tSort() {
+      // Kahn's algorithm; see http://en.wikipedia.org/wiki/Topological_sorting#Algorithms
+      List<Node> result = new ArrayList<>();
+      Set<Node> toProcess = new HashSet<>();
+      toProcess.add(findHead());
+      while(!toProcess.isEmpty()) {
+        Node n = firstElement(toProcess);
+        result.add(n);
+        toProcess.remove(n);
+        for (Edge e: new HashSet<>(n.outEdges)) { // avoid concurrent modification exception
+          e.remove();
+          if (e.to.inEdges.isEmpty()) {
+            toProcess.add(e.to);
+          }
+        }
+      }
+      for (Node node: nodes) {
+        if (! node.outEdges.isEmpty()) {
+          throw new IllegalStateException("the flow from " + node.name + " to " + firstElement(node.outEdges).to.name
+              + " is part of a cycle");
+        }
+      }
+      return result;
     }
 
-    private void add(final Node node, final ArrayList<Node> result) {
-        if (result.contains(node)) {
-            result.remove(node);
-            for (final Edge edge : node.outEdge) {
-                remove(edge.to, result);
-            }
-        }
-
-        result.add(node);
-        if (!node.outEdge.isEmpty()) {
-            checkCyclic(node, result);
-            for (final Edge edge : node.outEdge) {
-                add(edge.to, result);
-            }
-
-        }
-
-    }
-
-    private void remove(final Node n, final ArrayList<Node> result) {
-        result.remove(n);
-        final LinkedHashSet<Edge> outEdge = n.outEdge;
-        for (final Edge edge : outEdge) {
-            remove(edge.to, result);
-        }
-    }
-
-    private void checkCyclic(final Node node, final ArrayList<Node> result) {
-        if (!node.outEdge.isEmpty()
-                && result.contains(node.outEdge.iterator().next().to)
-                && !node.outEdge.iterator().next().to.type.equals("join")
-                && !node.outEdge.iterator().next().to.type.equals("kill")) {
-            throw new IllegalStateException(String.format("Workflow is cyclic [%s,%s]", node.toString(), node.outEdge.iterator().next().to));
-        }
+    private <T> T firstElement(Iterable<T> elements) {
+      return elements.iterator().next();
     }
 
     Node findHead() {
@@ -86,20 +79,31 @@ public class DirectedGraph {
         return nodes.iterator().next();
     }
 
+    @Override
+    public String toString() {
+      StringBuilder builder = new StringBuilder();
+      for (Node node: nodes) {
+        builder.append("{ ").append(node.name).append("->(");
+        for (Edge edge: node.outEdges) {
+          builder.append(edge.to.name).append(",");
+        }
+        builder.append(")}, ");
+      }
+      return builder.toString();
+    }
+
     public static class Node {
         private final String name;
-        private final String type;
         private final LinkedHashSet<Edge> inEdges = new LinkedHashSet<Edge>();
-        private final LinkedHashSet<Edge> outEdge = new LinkedHashSet<Edge>();
+        private final LinkedHashSet<Edge> outEdges = new LinkedHashSet<Edge>();
 
-        public Node(final String name, final String type) {
+        public Node(final String name) {
             this.name = name;
-            this.type = type;
         }
 
         public Node addEdge(final Node node) {
             final Edge e = new Edge(this, node);
-            outEdge.add(e);
+            outEdges.add(e);
             node.inEdges.add(e);
             return this;
         }
@@ -117,7 +121,6 @@ public class DirectedGraph {
             final Node node = (Node) o;
 
             return !(name != null ? !name.equals(node.name) : node.name != null);
-
         }
 
         @Override
@@ -133,6 +136,11 @@ public class DirectedGraph {
         public Edge(final Node from, final Node to) {
             this.from = from;
             this.to = to;
+        }
+
+        private void remove() {
+          from.outEdges.remove(this);
+          to.inEdges.remove(this);
         }
 
         @Override

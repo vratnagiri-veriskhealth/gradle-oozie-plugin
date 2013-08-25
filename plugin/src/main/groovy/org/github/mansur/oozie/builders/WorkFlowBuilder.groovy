@@ -60,7 +60,7 @@ class WorkFlowBuilder {
               }
             }
             start(to: graph.findHead())
-            graph.sort().each {
+            graph.tSort().each {
                 def action = findAction(it.toString(), actions)
                 def type = action.get("type")
                 def builder = findBuilder(type)
@@ -173,11 +173,10 @@ class WorkFlowBuilder {
         actions.each {
             it = asMap(it)
             String name = it.get("name")
-            def type = it.get("type")
             if (name == null || name.length() <= 0) {
                 throw new IllegalStateException("Found action without a name!")
             }
-            def node = new DirectedGraph.Node(name, type)
+            def node = new DirectedGraph.Node(name)
             nodesMap.put(name, node)
         }
         nodesMap
