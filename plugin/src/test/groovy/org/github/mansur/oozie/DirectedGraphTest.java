@@ -17,11 +17,16 @@
 package org.github.mansur.oozie;
 
 import org.github.mansur.oozie.builders.DirectedGraph;
+import org.github.mansur.oozie.builders.DirectedGraph.Node;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.junit.Assert.*;
 
 /**
  * @author Muhammad Ashraf
@@ -54,6 +59,47 @@ public class DirectedGraphTest {
         final List<DirectedGraph.Node> sortedGraph = directedGraph.sort();
         assertThat(sortedGraph).containsExactly(node1);
 
+    }
+
+    @Test
+    public void testNonCyclic() {
+      List<DirectedGraph.Node> nodes = new ArrayList<>();
+      for (int i = 0; i < 4; i++) {
+        DirectedGraph.Node node = new DirectedGraph.Node("node" + i, "type");
+        for (Node n : nodes) {
+          n.addEdge(node);
+        }
+        nodes.add(node);
+      }
+      DirectedGraph dag = new DirectedGraph();
+      dag.addNode(nodes.get(0));
+      dag.addNode(nodes.get(1));
+      dag.addNode(nodes.get(2));
+      dag.addNode(nodes.get(3));
+      List<Node> sorted = dag.sort();
+      assertEquals(nodes, sorted);
+    }
+
+    @Test
+    public void testDiamondDag() {
+      Node start = new Node("root", "type");
+      Node left = new Node("left", "type");
+      Node right = new Node("right", "type");
+      Node end = new Node("end", "type");
+      start.addEdge(left);
+      start.addEdge(right);
+      left.addEdge(end);
+      right.addEdge(end);
+      DirectedGraph dag = new DirectedGraph();
+      dag.addNode(start);
+      dag.addNode(left);
+      dag.addNode(right);
+      dag.addNode(end);
+
+      List<Node> sorted = dag.sort();
+      assertEquals(4, sorted.size());
+      assertEquals(start, sorted.get(0));
+      assertEquals(end, sorted.get(3));
     }
 
     @Test(expected = IllegalStateException.class)
