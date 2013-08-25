@@ -243,6 +243,124 @@ class OozieWorkflowPluginSpec extends Specification {
 
     }
 
+    def "noncyclic DAG"() {
+      //       flow_decision
+      //          /   |  \
+      //         m2   |   \
+      //           \  |    \
+      //            \ v     \
+      //             m3---->m4--->end_node
+        expect:
+        project.tasks.findByName(TASK_NAME) == null
+
+        when:
+        project.apply plugin: 'oozie'
+
+        project.oozie {
+            def jobTracker = "http://jobtracker"
+            def namenode = "http://namenode"
+
+            def common_props = [
+                    jobTracker: "$jobTracker",
+                    namenode: "$namenode",
+                    jobXML: "dev_prop.xml"
+            ]
+
+            def flow_decision = [
+                    name: "flow_decision",
+                    type: "decision",
+                    switch: [
+                            [to: "mr1", if: "some condition"],
+                            [to: "mr2", if: "some other condition"]
+                    ],
+                    default: "mr4"
+            ]
+
+            def mr1 = [
+                    name: "mr1",
+                    type: "mapreduce",
+                    delete: ["${jobTracker}/pattern"],
+                    jobXML: "job.xml",
+                    ok: "mr3",
+                    error: "fail",
+                    configuration: [
+                            "mapred.map.output.compress": "false",
+                            "mapred.job.queue.name": "queuename"
+                    ]
+            ]
+
+            def mr2 = [
+                    name: "mr2",
+                    type: "mapreduce",
+                    delete: ["${jobTracker}/pattern"],
+                    jobXML: "job.xml",
+                    ok: "mr3",
+                    error: "fail",
+                    configuration: [
+                            "mapred.map.output.compress": "false",
+                            "mapred.job.queue.name": "queuename"
+                    ]
+            ]
+
+            def mr3 = [
+                    name: "mr3",
+                    type: "mapreduce",
+                    delete: ["${jobTracker}/pattern"],
+                    jobXML: "job.xml",
+                    ok: "mr4",
+                    error: "fail",
+                    configuration: [
+                            "mapred.map.output.compress": "false",
+                            "mapred.job.queue.name": "queuename"
+                    ]
+            ]
+
+            def mr4 = [
+                    name: "mr4",
+                    type: "mapreduce",
+                    delete: ["${jobTracker}/pattern"],
+                    jobXML: "job.xml",
+                    ok: "end_node",
+                    error: "fail",
+                    configuration: [
+                            "mapred.map.output.compress": "false",
+                            "mapred.job.queue.name": "queuename"
+                    ]
+            ]
+
+            def fail = [
+                    name: "fail",
+                    type: "kill",
+                    message: "workflow failed!"
+            ]
+
+
+            actions = [ flow_decision, mr1, mr2, mr3, mr4, fail ]
+
+            common = common_props
+            end = "end_node"
+            name = 'oozie_flow'
+            namespace = 'uri:oozie:workflow:0.1'
+        }
+
+        project.task(TASK_NAME, type: OozieWorkflowTask)
+
+        then:
+        project.extensions.findByName(EXTENSION_NAME) != null
+        Task task = project.tasks.findByName(TASK_NAME)
+        task.end == "end_node"
+        task.workflowName == 'oozie_flow'
+        task.namespace == 'uri:oozie:workflow:0.1'
+        task.common.size() == 3
+        task.workflowActions.size() == 6
+
+        and:
+        task.start()
+        def xml=new File("$project.buildDir/oozie_flow.xml")
+        xml.exists()
+
+    }
+
     def "Apply oozie with credentials"() {
         expect:
         project.tasks.findByName(TASK_NAME) == null
