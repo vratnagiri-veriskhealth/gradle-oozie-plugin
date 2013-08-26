@@ -7,8 +7,6 @@ abstract class ActionNode extends WorkflowNode {
   String ok
   String error
 
-  protected ActionNode(String type) { super(type) }
-
   @Override
   protected Map<String, String> rawMap() {
     super.rawMap() + [cred: cred, ok: ok, error: error]

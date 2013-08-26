@@ -5,5 +5,8 @@ import java.util.Map;
 class MapReduceNode extends HadoopActionNode {
   private static final long serialVersionUID = 1L
 
-  MapReduceNode() { super('mapreduce') }
+  @Override
+  protected Map<String, String> rawMap() {
+    return super.rawMap() + [type: 'mapreduce']
+  }
 }

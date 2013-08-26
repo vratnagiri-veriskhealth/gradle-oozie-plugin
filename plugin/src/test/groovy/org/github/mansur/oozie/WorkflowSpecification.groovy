@@ -300,7 +300,6 @@ class WorkflowSpecification extends Specification {
 
         def fork_flow = new ForkNode(
                 name: "fork_flow",
-                type: "fork",
                 paths: [
                         "move_files",
                         "mahout_fp_growth"
@@ -359,7 +358,6 @@ class WorkflowSpecification extends Specification {
 
         def first_map_reduce = new MapReduceNode(
                 name: "first_map_reduce",
-                type: "mapreduce",
                 delete: ["${jobTracker}/pattern"],
                 jobXml: "job.xml",
                 ok: "end_node",

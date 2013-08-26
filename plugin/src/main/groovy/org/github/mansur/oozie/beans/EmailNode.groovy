@@ -29,13 +29,12 @@ import java.util.List;
 class EmailNode extends ActionNode {
   private static final long serialVersionUID = 1L
 
-  EmailNode() { super('email') }
   String to
   String cc
   String subject
   String body
 
   protected Map<String, String> rawMap() {
-    super.rawMap() + [ to: to, cc: cc, subject: subject, body:body ]
+    super.rawMap() + [ type: 'email', to: to, cc: cc, subject: subject, body:body ]
   }
 }

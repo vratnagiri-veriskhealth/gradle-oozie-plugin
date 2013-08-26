@@ -8,10 +8,8 @@ class DecisionNode extends WorkflowNode {
   List<DecisionCaseNode> cases;
   String defaultCase;
 
-  DecisionNode() { super('decision') }
-
   @Override
   protected Map<String, String> rawMap() {
-    return super.rawMap() + [switch: cases.collect{ it.toMap() }, default: defaultCase];
+    return super.rawMap() + [type: 'decision', switch: cases.collect{ it.toMap() }, default: defaultCase];
   }
 }

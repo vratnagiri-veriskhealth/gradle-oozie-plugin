@@ -5,8 +5,6 @@ import java.util.Map
 abstract class HadoopActionNode extends ActionNode {
   private static final long serialVersionUID = 1L
 
-  protected HadoopActionNode(String type) { super(type); }
-
   String jobTracker
   String nameNode
   String jobXml

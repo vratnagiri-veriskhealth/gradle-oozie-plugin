@@ -5,13 +5,11 @@ import java.util.Map
 class PigNode extends HadoopActionNode {
   private static final long serialVersionUID = 1L
 
-  PigNode() { super('pig'); }
-
   String script
   List<String> params
 
   @Override
   protected Map<String, String> rawMap() {
-    super.rawMap() + [ script: script, params: params ]
+    super.rawMap() + [ type: 'pig', script: script, params: params ]
   }
 }

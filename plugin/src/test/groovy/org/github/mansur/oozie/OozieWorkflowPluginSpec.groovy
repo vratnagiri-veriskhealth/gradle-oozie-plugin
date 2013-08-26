@@ -350,7 +350,6 @@ class OozieWorkflowPluginSpec extends Specification {
 
             def hive_job = hive(
                     name: "hive_job",
-                    type: "hive",
                     delete: ["${jobTracker}/pattern"],
                     jobXml: "job.xml",
                     ok: "flow_decision",
@@ -387,7 +386,6 @@ class OozieWorkflowPluginSpec extends Specification {
 
             def flow_decision = decision(
                     name: "flow_decision",
-                    type: "decision",
                     cases: [
                             decisionCase("end_node", "some condition"),
                             decisionCase("first_map_reduce", "some other condition")

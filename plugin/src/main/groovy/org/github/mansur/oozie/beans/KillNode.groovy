@@ -5,12 +5,10 @@ import java.util.Map;
 class KillNode extends WorkflowNode {
   private static final long serialVersionUID = 1L
 
-  KillNode() { super('kill') }
-
   String message
 
   @Override
   protected Map<String, String> rawMap() {
-    super.rawMap() + [message: message]
+    super.rawMap() + [type: 'kill', message: message]
   }
 }

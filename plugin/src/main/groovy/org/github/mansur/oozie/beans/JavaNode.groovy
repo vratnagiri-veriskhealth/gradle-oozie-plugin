@@ -9,10 +9,8 @@ class JavaNode extends CapturingHadoopActionNode {
   String javaOpts
   List<String> args
 
-  JavaNode() { super('java') }
-
   @Override
   protected Map<String, String> rawMap() {
-    return super.rawMap() + [mainClass: mainClass, javaOpts: javaOpts, args: args]
+    return super.rawMap() + [type: 'java', mainClass: mainClass, javaOpts: javaOpts, args: args]
   }
 }

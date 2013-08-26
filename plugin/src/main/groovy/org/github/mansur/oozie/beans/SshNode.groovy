@@ -5,8 +5,6 @@ import java.util.Map
 class SshNode extends ActionNode {
   private static final long serialVersionUID = 1L
 
-  SshNode() { super('ssh'); }
-
   String host
   String command
   List<String> args
@@ -14,7 +12,7 @@ class SshNode extends ActionNode {
 
   @Override
   protected Map<String, String> rawMap() {
-    super.rawMap() + [ host: host, command: command, args: args ] +
+    super.rawMap() + [ type: 'ssh', host: host, command: command, args: args ] +
       (captureOutput == null ? [:] : [captureOutput : captureOutput])
   }
 }

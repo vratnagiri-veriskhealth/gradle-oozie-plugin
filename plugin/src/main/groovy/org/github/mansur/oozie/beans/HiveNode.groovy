@@ -5,13 +5,11 @@ import java.util.Map
 class HiveNode extends HadoopActionNode {
   private static final long serialVersionUID = 1L
 
-  HiveNode() { super('hive'); }
-
   String script
   Map<String, String> params
 
   @Override
   protected Map<String, String> rawMap() {
-    super.rawMap() + [ script: script, params: params ]
+    super.rawMap() + [ type: 'hive', script: script, params: params ]
   }
 }
