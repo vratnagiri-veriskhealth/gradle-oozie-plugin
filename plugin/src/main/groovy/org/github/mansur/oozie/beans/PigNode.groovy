@@ -8,7 +8,7 @@ class PigNode extends HadoopActionNode {
   PigNode() { super('pig'); }
 
   String script
-  Map<String, String> params
+  List<String> params
 
   @Override
   protected Map<String, String> rawMap() {

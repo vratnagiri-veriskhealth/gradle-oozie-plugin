@@ -143,11 +143,8 @@ class SAMPLE_XML {
         </property>
       </configuration>
       <script>first.hql</script>
-      <param>--input</param>
-      <param>/cart</param>
-      <param>--output</param>
-      <param>--maxheapSize</param>
-      <param>50</param>
+      <param>schema=standard</param>
+      <param>otherParam=other value</param>
     </hive>
     <ok to='authenticated_hive_job' />
     <error to='fail' />
@@ -171,11 +168,8 @@ class SAMPLE_XML {
         </property>
       </configuration>
       <script>first.hql</script>
-      <param>--input</param>
-      <param>/cart</param>
-      <param>--output</param>
-      <param>--maxheapSize</param>
-      <param>50</param>
+      <param>schema=standard</param>
+      <param>otherParam=other value</param>
     </hive>
     <ok to='flow_decision' />
     <error to='fail' />

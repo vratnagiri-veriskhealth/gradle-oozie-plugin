@@ -12,8 +12,8 @@ abstract class HadoopActionNode extends ActionNode {
   String jobXml
   List<String> delete
   List<String> mkdir
-  String file
-  String archive
+  List<String> file
+  List<String> archive
   Map<String, String> configuration
 
   @Override
@@ -21,6 +21,7 @@ abstract class HadoopActionNode extends ActionNode {
     super.rawMap() + [
       configuration: configuration,
       jobTracker: jobTracker,
+      jobXML: jobXml,
       namenode: nameNode,
       delete: delete,
       mkdir: mkdir,

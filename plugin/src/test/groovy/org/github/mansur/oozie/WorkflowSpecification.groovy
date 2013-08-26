@@ -2,7 +2,7 @@ package org.github.mansur.oozie
 
 import org.custommonkey.xmlunit.Diff
 import org.custommonkey.xmlunit.XMLUnit
-import org.github.mansur.oozie.beans.Workflow
+import org.github.mansur.oozie.beans.*
 import org.github.mansur.oozie.builders.WorkFlowBuilder
 import spock.lang.Specification
 
@@ -151,13 +151,7 @@ class WorkflowSpecification extends Specification {
                         "mapred.job.queue.name": "queuename"
                 ],
                 script: "first.hql",
-                params: [
-                        "--input",
-                        "/cart",
-                        "--output",
-                        "--maxheapSize",
-                        "50"
-                ]
+                params: [ schema: 'standard', otherParam: 'other value' ]
         ]
 
         def authenticated_hive_job = [
@@ -174,13 +168,7 @@ class WorkflowSpecification extends Specification {
                         "mapred.job.queue.name": "queuename"
                 ],
                 script: "first.hql",
-                params: [
-                        "--input",
-                        "/cart",
-                        "--output",
-                        "--maxheapSize",
-                        "50"
-                ]
+                params: [ schema: 'standard', otherParam: 'other value' ]
         ]
 
         def first_map_reduce = [
@@ -231,6 +219,190 @@ class WorkflowSpecification extends Specification {
         xmlDiff.similar()
     }
 
+    def "WorkFlow dsl should be able to create a valid oozie xml Spec using beans"() {
+        when:
+        def jobTracker = "http://jobtracker"
+        def namenode = "http://namenode"
+
+        def common = [
+                jobTracker: "$jobTracker",
+                namenode: "$namenode",
+                jobXML: "dev_prop.xml"
+        ]
+
+        def credentials = [
+                "hive_credentials": [
+                  type: "hcat",
+                  configuration: [
+                    "hcat.metastore.uri": "thrift://localhost:9083/",
+                    "hcat.metastore.principal": "hive/_HOST@DOMAIN"
+                  ]
+                ]
+        ]
+
+        def shell_to_prod = new ShellNode(
+                name: "shell_to_prod",
+                ok: "fork_flow",
+                error: "fail",
+                delete: ["/tmp/workDir"],
+                mkdir: ["/tmp/workDir"],
+                exec: "ssh test@localhost",
+                captureOutput: true,
+                configuration: [
+                        "mapred.map.output.compress": "false",
+                        "mapred.job.queue.name": "queuename"
+                ],
+                args: [
+                        "input",
+                        "output",
+                        "cache.txt"
+                ],
+                env: [ "java_home" ],
+                file: [
+                        "file1.txt",
+                        "file2.txt"
+                ],
+                archive: [
+                        "job.tar"
+                ]
+        )
+
+        def move_files = new FsNode(
+                name: "move_files",
+                ok: "join_flow",
+                error: "fail",
+                delete: ["hdfs://foo:9000/usr/tucu/temp-data"],
+                mkdir: ['archives/${wf:id()}'],
+                move: [ new FsMoveNode( source: '${jobInput}', target: 'archives/${wf:id()}/processed-input' ),
+                        new FsMoveNode( source: '${jobInput}', target: 'archives/${wf:id()}/raw-input' ) ],
+
+                chmod: [ new FsChmodNode( path: '${jobOutput}', permissions: '-rwxrw-rw-', dirFiles: true ) ]
+        )
+
+        def mahout_pfpgrowth = new JavaNode(
+                name: "mahout_fp_growth",
+                delete: ["${jobTracker}/pattern"],
+                mainClass: "some.random.class",
+                jobXml: "job.xml",
+                ok: "join_flow",
+                error: "fail",
+                configuration: [
+                        "mapred.map.output.compress": "false",
+                        "mapred.job.queue.name": "queuename"
+                ],
+                args: [
+                        "--input",
+                        "/cart",
+                        "--output",
+                        "--maxheapSize",
+                        "50"
+                ])
+
+        def fork_flow = new ForkNode(
+                name: "fork_flow",
+                type: "fork",
+                paths: [
+                        "move_files",
+                        "mahout_fp_growth"
+                ]
+        )
+
+        def join_flow = new JoinNode( name: "join_flow", to: "pig_job" )
+
+        def pig_job = new PigNode(
+                name: "pig_job",
+                delete: ["${jobTracker}/pattern"],
+                jobXml: "job.xml",
+                ok: "hive_job",
+                error: "fail",
+                configuration: [
+                        "mapred.map.output.compress": "false",
+                        "mapred.job.queue.name": "queuename"
+                ],
+                script: "first.pig",
+                params: [
+                        "--input",
+                        "/cart",
+                        "--output",
+                        "--maxheapSize",
+                        "50"
+                ])
+
+        def hive_job = new HiveNode(
+                name: "hive_job",
+                delete: ["${jobTracker}/pattern"],
+                jobXml: "job.xml",
+                ok: "authenticated_hive_job",
+                error: "fail",
+                configuration: [
+                        "mapred.map.output.compress": "false",
+                        "mapred.job.queue.name": "queuename"
+                ],
+                script: "first.hql",
+                params: [ schema: 'standard', otherParam: 'other value' ]
+        )
+
+        def authenticated_hive_job = new HiveNode(
+                name: "authenticated_hive_job",
+                cred: "hive_credentials",
+                delete: ["${jobTracker}/pattern"],
+                jobXml: "job.xml",
+                ok: "flow_decision",
+                error: "fail",
+                configuration: [
+                        "mapred.map.output.compress": "false",
+                        "mapred.job.queue.name": "queuename"
+                ],
+                script: "first.hql",
+                params: [ schema: 'standard', otherParam: 'other value' ]
+        )
+
+        def first_map_reduce = new MapReduceNode(
+                name: "first_map_reduce",
+                type: "mapreduce",
+                delete: ["${jobTracker}/pattern"],
+                jobXml: "job.xml",
+                ok: "end_node",
+                error: "fail",
+                configuration: [
+                        "mapred.map.output.compress": "false",
+                        "mapred.job.queue.name": "queuename"
+                ]
+        )
+
+        def flow_decision = new DecisionNode(
+                name: "flow_decision",
+                cases: [ new DecisionCaseNode(to: 'end_node', condition: 'some condition'),
+                         new DecisionCaseNode(to: 'first_map_reduce', condition: 'some other condition'),
+                ],
+                defaultCase: "end_node"
+        )
+
+        def fail = new KillNode(
+                name: "fail",
+                message: "workflow failed!"
+        )
+
+        def actions = [shell_to_prod, move_files, mahout_pfpgrowth, fork_flow, join_flow, pig_job, hive_job, authenticated_hive_job, first_map_reduce, flow_decision, fail]
+        def workflow = new Workflow()
+        workflow.actions = actions
+        workflow.common = common
+        workflow.end = "end_node"
+        workflow.name = 'oozie_flow'
+        workflow.namespace = 'uri:oozie:workflow:0.1'
+        workflow.credentials = credentials
+
+        def builder = new WorkFlowBuilder()
+        def result = builder.buildWorkflow(workflow)
+
+        XMLUnit.setIgnoreWhitespace(true)
+        println "expected: ${SAMPLE_XML.EXPECTED_FLOW}"
+        println "actual: ${result}"
+        def xmlDiff = new Diff(result, SAMPLE_XML.EXPECTED_FLOW)
+
+        then:
+        xmlDiff.similar()
+    }
     def "Missing Credentials should be no problem"() {
         when:
         def jobTracker = "http://jobtracker"

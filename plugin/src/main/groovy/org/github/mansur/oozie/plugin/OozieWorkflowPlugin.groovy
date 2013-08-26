@@ -22,6 +22,7 @@ class OozieWorkflowPlugin implements Plugin<Project> {
       project.metaClass.oozieHive= { params -> new HiveNode(params) }
       project.metaClass.ooziePig= { params -> new PigNode(params) }
       project.metaClass.oozieJava= { params -> new JavaNode(params) }
+      project.metaClass.oozieMapReduce = { params -> new MapReduceNode(params) }
       project.metaClass.oozieShell = { params -> new ShellNode(params) }
       project.metaClass.oozieSsh = { params -> new SshNode(params) }
       project.metaClass.oozieFs= { params -> new FsNode(params) }

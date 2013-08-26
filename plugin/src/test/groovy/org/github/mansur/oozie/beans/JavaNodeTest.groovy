@@ -18,7 +18,7 @@ class JavaNodeTest extends AbstractHadoopActionNodeTest {
     def javaArgs = [ mainClass: 'com.example.Main', javaOpts: '-XrunFast', args: ['a', 'b'] ]
         def args = baseArgs + javaArgs;
     assertEquals(
-      baseResult + javaArgs + [type: 'java', captureOutput: 'true'],
+      baseResult + javaArgs + [type: 'java', captureOutput: true],
       new JavaNode(baseArgs + javaArgs + [captureOutput: true]).toMap());
   }
 }

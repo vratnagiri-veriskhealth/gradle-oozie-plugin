@@ -8,7 +8,7 @@ class PigNodeTest extends AbstractHadoopActionNodeTest {
 
   @Test
   public void testToMap() {
-    def pigArgs = [ script: 'some.pig', params: [a:'b'] ]
+    def pigArgs = [ script: 'some.pig', params: ['a', 'b'] ]
     def args = baseArgs + pigArgs;
     assertEquals(baseResult + pigArgs + [type: 'pig'], new PigNode(args).toMap());
   }

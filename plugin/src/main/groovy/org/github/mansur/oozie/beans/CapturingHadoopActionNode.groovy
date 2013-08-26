@@ -11,6 +11,6 @@ abstract class CapturingHadoopActionNode extends HadoopActionNode {
 
   @Override
   protected Map<String, String> rawMap() {
-    return super.rawMap() + (captureOutput == null ? [:] : [captureOutput: captureOutput ? 'true' : 'false'])
+    return super.rawMap() + (captureOutput == null ? [:] : [captureOutput: captureOutput])
   }
 }

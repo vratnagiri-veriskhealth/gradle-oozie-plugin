@@ -15,6 +15,6 @@ class SshNode extends ActionNode {
   @Override
   protected Map<String, String> rawMap() {
     super.rawMap() + [ host: host, command: command, args: args ] +
-      (captureOutput == null ? [:] : [captureOutput : captureOutput ? 'true' : 'false'])
+      (captureOutput == null ? [:] : [captureOutput : captureOutput])
   }
 }

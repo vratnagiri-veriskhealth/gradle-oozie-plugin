@@ -18,7 +18,7 @@ class SshNodeTest {
   public void testCaptureToMap() {
     def args = [name: 'remote', ok: 'next', error: 'fail', host: 'example.com', command: 'ls', args: ['/foo']]
     assertEquals(
-      [type: 'ssh', captureOutput: 'true'] + args,
+      [type: 'ssh', captureOutput: true] + args,
       new SshNode(args + [captureOutput: true]).toMap())
   }
 

@@ -3,8 +3,6 @@ package org.github.mansur.oozie.beans
 import java.util.Map;
 
 class FsNode extends ActionNode {
-  private static final long serialVersionUID = 1L
-
   List<String> delete
   List<String> mkdir
   List<FsMoveNode> move

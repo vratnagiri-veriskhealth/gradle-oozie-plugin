@@ -14,8 +14,8 @@ class AbstractHadoopActionNodeTest {
     jobTracker: 'the job tracker',
     delete: ['a', 'b'],
     mkdir: ['make me'],
-    file: 'a file',
-    archive: 'an archive',
+    file: ['a file'],
+    archive: ['an archive'],
     configuration: [c: 'd']
   ]
 
