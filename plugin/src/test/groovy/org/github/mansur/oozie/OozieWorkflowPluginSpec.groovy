@@ -324,12 +324,9 @@ class OozieWorkflowPluginSpec extends Specification {
                     ]
             )
 
-            def fork_flow = fork(
-                name: "fork_flow",
-                paths: [ "move_files", "mahout_fp_growth" ]
-            )
+            def fork_flow = fork("fork_flow", [ "move_files", "mahout_fp_growth" ])
 
-            def join_flow = join ( name: "join_flow", to: "pig_job" )
+            def join_flow = join ( "join_flow", "pig_job" )
 
             def pig_job = pig(
                     name: "pig_job",
