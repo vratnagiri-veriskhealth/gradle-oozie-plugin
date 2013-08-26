@@ -2,15 +2,14 @@ package org.github.mansur.oozie.beans
 
 import java.util.Map;
 
-class KillNode extends WorkflowNode {
+class ForkNode extends WorkflowNode {
   private static final long serialVersionUID = 1L
 
-  KillNode() { super('kill') }
-
-  String message
+  public ForkNode() { super('fork') }
+  List<String> paths
 
   @Override
   protected Map<String, String> rawMap() {
-    super.rawMap() + [message: message]
+    super.rawMap() + [paths: paths]
   }
 }

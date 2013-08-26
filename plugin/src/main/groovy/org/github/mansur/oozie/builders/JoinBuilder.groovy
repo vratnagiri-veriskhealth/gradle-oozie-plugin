@@ -24,7 +24,6 @@ import groovy.xml.MarkupBuilder
  */
 class JoinBuilder extends BaseBuilder {
 
-
     def buildXML(MarkupBuilder xml, HashMap<String, Object> action, HashMap<String, Object> common) {
         HashMap<String, Object> map = getMergedProperties(common, action)
         xml.join(name: map.get(NAME), to: map.get("to"))

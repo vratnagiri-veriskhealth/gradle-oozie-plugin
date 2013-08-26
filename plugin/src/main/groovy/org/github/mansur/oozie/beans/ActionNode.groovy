@@ -7,7 +7,10 @@ abstract class ActionNode extends WorkflowNode {
   String ok
   String error
 
-  Map<String, String> toMap() {
-    prune(super.toMap() + [cred: cred, ok: ok, error: error])
+  protected ActionNode(String type) { super(type) }
+
+  @Override
+  protected Map<String, String> rawMap() {
+    super.rawMap() + [cred: cred, ok: ok, error: error]
   }
 }

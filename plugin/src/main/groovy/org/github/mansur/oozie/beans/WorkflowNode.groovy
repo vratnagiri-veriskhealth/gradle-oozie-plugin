@@ -6,6 +6,10 @@ import java.util.Map;
 abstract class WorkflowNode implements Serializable {
   private static final long serialVersionUID = 1L
 
+  protected WorkflowNode(String type) {
+    this.type = type;
+  }
+
   String name
   String type
 
@@ -13,7 +17,11 @@ abstract class WorkflowNode implements Serializable {
     map.findAll { it.value != null }
   }
 
-  Map<String, String> toMap() {
-    prune([name: name, type: type])
+  protected Map<String, String> rawMap() {
+    [name: name, type: type]
+  }
+
+  final Map<String, String> toMap() {
+    prune(rawMap())
   }
 }

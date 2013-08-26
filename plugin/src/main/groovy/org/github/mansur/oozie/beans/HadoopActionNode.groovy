@@ -5,6 +5,8 @@ import java.util.Map
 abstract class HadoopActionNode extends ActionNode {
   private static final long serialVersionUID = 1L
 
+  protected HadoopActionNode(String type) { super(type); }
+
   String jobTracker
   String nameNode
   String jobXml
@@ -15,14 +17,14 @@ abstract class HadoopActionNode extends ActionNode {
   Map<String, String> configuration
 
   @Override
-  public Map<String, String> toMap() {
-    prune(super.toMap() + [
+  protected Map<String, String> rawMap() {
+    super.rawMap() + [
       configuration: configuration,
       jobTracker: jobTracker,
       namenode: nameNode,
       delete: delete,
       mkdir: mkdir,
       file: file,
-      arhchive: archive])
+      archive: archive]
   }
 }
