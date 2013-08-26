@@ -19,21 +19,6 @@ class OozieWorkflowPlugin implements Plugin<Project> {
     void apply(Project project) {
       project.extensions.create(EXTENSION_NAME, OozieWorkflowExtension)
       addTask(project)
-      project.metaClass.oozieHive= { params -> new HiveNode(params) }
-      project.metaClass.ooziePig= { params -> new PigNode(params) }
-      project.metaClass.oozieJava= { params -> new JavaNode(params) }
-      project.metaClass.oozieMapReduce = { params -> new MapReduceNode(params) }
-      project.metaClass.oozieShell = { params -> new ShellNode(params) }
-      project.metaClass.oozieSsh = { params -> new SshNode(params) }
-      project.metaClass.oozieFs= { params -> new FsNode(params) }
-      project.metaClass.oozieFsMove= { params -> new FsMoveNode(params) }
-      project.metaClass.oozieFsChmod= { params -> new FsChmodNode(params) }
-      project.metaClass.oozieEmail= { params -> new EmailNode(params) }
-      project.metaClass.oozieKill= { params -> new KillNode(params) }
-      project.metaClass.oozieCase= { to, condition -> new DecisionCaseNode([to: to, condition: condition]) }
-      project.metaClass.oozieDecision= { params -> new DecisionNode(params) }
-      project.metaClass.oozieFork= { params -> new ForkNode(params) }
-      project.metaClass.oozieJoin= { params -> new JoinNode(params) }
     }
 
     private void addTask(Project project) {
