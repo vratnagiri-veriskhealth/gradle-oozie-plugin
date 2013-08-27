@@ -33,7 +33,7 @@ class WorkFlowBuilder {
             "shell": new ShellBuilder(),
             "fork": new ForkBuilder(),
             "join": new JoinBuilder(),
-            "decision": new DecesionBuilder(),
+            "decision": new DecisionBuilder(),
             "pig": new PigBuilder(),
             "hive": new HiveBuilder(),
             "email": new EmailBuilder(),

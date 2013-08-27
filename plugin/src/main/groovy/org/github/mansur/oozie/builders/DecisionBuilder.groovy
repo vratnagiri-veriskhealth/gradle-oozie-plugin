@@ -22,7 +22,7 @@ import groovy.xml.MarkupBuilder
  * @author Muhammad Ashraf
  * @since 7/25/13
  */
-class DecesionBuilder extends BaseBuilder {
+class DecisionBuilder extends BaseBuilder {
 
 
     def buildXML(MarkupBuilder xml, HashMap<String, Object> action, HashMap<String, Object> common) {
