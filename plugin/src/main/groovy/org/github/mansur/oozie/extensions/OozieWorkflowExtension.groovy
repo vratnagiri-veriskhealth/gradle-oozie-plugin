@@ -1,6 +1,7 @@
 package org.github.mansur.oozie.extensions
 
 import java.util.Map;
+import org.github.mansur.oozie.beans.CommonProperties
 import org.github.mansur.oozie.beans.DecisionCaseNode
 import org.github.mansur.oozie.beans.DecisionNode
 import org.github.mansur.oozie.beans.EmailNode
@@ -26,7 +27,7 @@ class OozieWorkflowExtension {
     String name
     String end
     String namespace
-    HashMap<String, Object> common
+    Object common
     HashMap<String, Object> jobXML
     List<HashMap<String, Object>> actions
     Map<String, Map<String, String>> credentials
@@ -52,4 +53,5 @@ class OozieWorkflowExtension {
     def ForkNode fork(String name, List<String> paths) { new ForkNode(name: name, paths: paths) }
     def JoinNode join(params) { new JoinNode(params) }
     def JoinNode join(String name, String to) { new JoinNode(name: name, to: to) }
+    def CommonProperties common(params) { new CommonProperties(params) }
 }

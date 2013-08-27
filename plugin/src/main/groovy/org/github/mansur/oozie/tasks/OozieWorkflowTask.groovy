@@ -17,7 +17,7 @@ class OozieWorkflowTask extends DefaultTask {
     @Input String workflowName
     @Input String end
     @Input String namespace = 'uri:oozie:workflow:0.1'
-    @Input HashMap<String, Object> common
+    @Input Object common
     @Input HashMap<String, Object> jobXML
     @Input List<Object> workflowActions
     @Input @Optional LinkedHashMap<String, LinkedHashMap<String, Object>> credentials = null

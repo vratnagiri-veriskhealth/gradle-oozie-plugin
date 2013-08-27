@@ -27,7 +27,7 @@ class Workflow {
     String name
     String end
     String namespace
-    HashMap<String, Object> common
+    Object common
     HashMap<String, Object> jobXML
     List<Map<String, Object>> actions
     Map<String, Map<String, Object>> credentials

@@ -255,14 +255,11 @@ class OozieWorkflowPluginSpec extends Specification {
             def jobTracker = "http://jobtracker"
             def namenode = "http://namenode"
 
-            def common_props = [
-                    jobTracker: "$jobTracker",
-                    namenode: "$namenode",
-                    jobXML: "dev_prop.xml"
-            ]
-
-            println "my class: ${this.getClass()}"
-            println "my metaclass: ${this.metaClass}"
+            def common_props = common (
+              jobTracker: "$jobTracker",
+              nameNode: "$namenode",
+              jobXml: "dev_prop.xml"
+            )
 
             def shell_to_prod = shell(
                 name: "shell_to_prod",
@@ -421,7 +418,7 @@ class OozieWorkflowPluginSpec extends Specification {
         task.end == "end_node"
         task.workflowName == 'oozie_flow'
         task.namespace == 'uri:oozie:workflow:0.1'
-        task.common.size() == 3
+        task.common.toMap().size() == 3
         task.workflowActions.size() == 10
 
         and:

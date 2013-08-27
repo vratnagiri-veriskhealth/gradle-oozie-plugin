@@ -238,11 +238,11 @@ class WorkflowSpecification extends Specification {
         def jobTracker = "http://jobtracker"
         def namenode = "http://namenode"
 
-        def common = [
-                jobTracker: "$jobTracker",
-                namenode: "$namenode",
-                jobXML: "dev_prop.xml"
-        ]
+        def common = new CommonProperties(
+          jobTracker: "$jobTracker",
+          nameNode: "$namenode",
+          jobXml: "dev_prop.xml"
+        )
 
         def credentials = [
                 "hive_credentials": [

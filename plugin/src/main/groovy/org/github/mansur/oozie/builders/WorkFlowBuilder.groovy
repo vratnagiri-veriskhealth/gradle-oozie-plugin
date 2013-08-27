@@ -66,7 +66,7 @@ class WorkFlowBuilder {
                 def action = findAction(it.toString(), actions)
                 def type = action.get("type")
                 def builder = findBuilder(type)
-                builder.buildXML(workflow, action, wf.common)
+                builder.buildXML(workflow, action, asMap(wf.common))
             }
             end(name: wf.end)
         }
