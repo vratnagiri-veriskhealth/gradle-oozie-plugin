@@ -19,6 +19,7 @@ Following workflow actions are supported
 5. [ssh](http://oozie.apache.org/docs/3.3.0/WorkflowFunctionalSpec.html#a3.2.5_Ssh_Action)
 6. [fs](http://oozie.apache.org/docs/3.3.0/WorkflowFunctionalSpec.html#a3.2.4_Fs_HDFS_action)
 7. [shell](http://oozie.apache.org/docs/3.3.0/DG_ShellActionExtension.html)
+8. [sub-workflow](http://oozie.apache.org/docs/3.3.0/WorkflowFunctionalSpec.html#a3.2.6_Sub-workflow_Action)
 
 In addition following decision nodes are also supported
 
@@ -26,7 +27,7 @@ In addition following decision nodes are also supported
  2. [end](http://oozie.apache.org/docs/3.3.0/WorkflowFunctionalSpec.html#a3.1.2_End_Control_Node)
  3. [kill](http://oozie.apache.org/docs/3.3.0/WorkflowFunctionalSpec.html#a3.1.3_Kill_Control_Node)
  4. [decision](http://oozie.apache.org/docs/3.3.0/WorkflowFunctionalSpec.html#a3.1.4_Decision_Control_Node)
- 5. [frok and join](http://oozie.apache.org/docs/3.3.0/WorkflowFunctionalSpec.html#a3.1.5_Fork_and_Join_Control_Nodes)
+ 5. [fork and join](http://oozie.apache.org/docs/3.3.0/WorkflowFunctionalSpec.html#a3.1.5_Fork_and_Join_Control_Nodes)
 
 # Usage
 

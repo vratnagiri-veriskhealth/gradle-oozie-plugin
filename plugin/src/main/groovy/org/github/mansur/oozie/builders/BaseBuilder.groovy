@@ -50,6 +50,8 @@ abstract class BaseBuilder {
     public static final String CC = "cc"
     public static final String SUBJECT = "subject"
     public static final String BODY = "body"
+    public static final String APP_PATH = "appPath";
+    public static final String PROPAGATE_CONFIGURATION = "propagateConfiguration";
 
 
     protected HashMap<String, Object> getMergedProperties(HashMap<String, Object> common, HashMap<String, Object> action) {

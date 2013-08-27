@@ -121,6 +121,23 @@ class SAMPLE_XML {
       <param>--maxheapSize</param>
       <param>50</param>
     </pig>
+    <ok to='sub_workflow_job' />
+    <error to='fail' />
+  </action>
+  <action name='sub_workflow_job'>
+    <sub-workflow>
+      <app-path>hdfs://foo:9000/usr/tucu/temp-data</app-path>
+      <configuration>
+        <property>
+          <name>property.name</name>
+          <value>property.value</value>
+        </property>
+        <property>
+          <name>property1.name</name>
+          <value>property1.value</value>
+        </property>
+      </configuration>
+    </sub-workflow>
     <ok to='hive_job' />
     <error to='fail' />
   </action>

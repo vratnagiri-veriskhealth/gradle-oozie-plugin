@@ -122,7 +122,7 @@ class WorkflowSpecification extends Specification {
                 delete: ["${jobTracker}/pattern"],
                 mainClass: "some.random.class",
                 jobXML: "job.xml",
-                ok: "hive_job",
+                ok: "sub_workflow_job",
                 error: "fail",
                 configuration: [
                         "mapred.map.output.compress": "false",
@@ -137,6 +137,18 @@ class WorkflowSpecification extends Specification {
                         "50"
                 ]
         ]
+
+        def sub_workflow_job = [
+          name: "sub_workflow_job",
+          type: "sub-workflow",
+          appPath: "hdfs://foo:9000/usr/tucu/temp-data",
+          ok: "hive_job",
+          error: "fail",
+            configuration: [
+                "property.name": "property.value",
+                "property1.name": "property1.value"
+            ]
+          ]
 
         def hive_job = [
                 name: "hive_job",
@@ -200,7 +212,7 @@ class WorkflowSpecification extends Specification {
                 message: "workflow failed!"
         ]
 
-        def actions = [shell_to_prod, move_files, mahout_pfpgrowth, fork_flow, join_flow, pig_job, hive_job, authenticated_hive_job, first_map_reduce, flow_decision, fail]
+        def actions = [shell_to_prod, move_files, mahout_pfpgrowth, fork_flow, join_flow, pig_job, sub_workflow_job, hive_job, authenticated_hive_job, first_map_reduce, flow_decision, fail]
         def workflow = new Workflow()
         workflow.actions = actions
         workflow.common = common
@@ -213,6 +225,8 @@ class WorkflowSpecification extends Specification {
         def result = builder.buildWorkflow(workflow)
 
         XMLUnit.setIgnoreWhitespace(true)
+        println "expected: ${SAMPLE_XML.EXPECTED_FLOW}"
+        println "got: ${result}"
         def xmlDiff = new Diff(result, SAMPLE_XML.EXPECTED_FLOW)
 
         then:
@@ -312,7 +326,7 @@ class WorkflowSpecification extends Specification {
                 name: "pig_job",
                 delete: ["${jobTracker}/pattern"],
                 jobXml: "job.xml",
-                ok: "hive_job",
+                ok: "sub_workflow_job",
                 error: "fail",
                 configuration: [
                         "mapred.map.output.compress": "false",
@@ -326,6 +340,17 @@ class WorkflowSpecification extends Specification {
                         "--maxheapSize",
                         "50"
                 ])
+
+        def sub_workflow_job = new SubWorkflowNode(
+          name: "sub_workflow_job",
+          appPath: "hdfs://foo:9000/usr/tucu/temp-data",
+          ok: "hive_job",
+          error: "fail",
+          configuration: [
+              "property.name": "property.value",
+              "property1.name": "property1.value"
+          ]
+        )
 
         def hive_job = new HiveNode(
                 name: "hive_job",
@@ -381,7 +406,7 @@ class WorkflowSpecification extends Specification {
                 message: "workflow failed!"
         )
 
-        def actions = [shell_to_prod, move_files, mahout_pfpgrowth, fork_flow, join_flow, pig_job, hive_job, authenticated_hive_job, first_map_reduce, flow_decision, fail]
+        def actions = [shell_to_prod, move_files, mahout_pfpgrowth, fork_flow, join_flow, pig_job, hive_job, authenticated_hive_job, sub_workflow_job, first_map_reduce, flow_decision, fail]
         def workflow = new Workflow()
         workflow.actions = actions
         workflow.common = common

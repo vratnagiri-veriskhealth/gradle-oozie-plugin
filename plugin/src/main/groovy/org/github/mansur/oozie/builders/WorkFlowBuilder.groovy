@@ -37,7 +37,8 @@ class WorkFlowBuilder {
             "pig": new PigBuilder(),
             "hive": new HiveBuilder(),
             "email": new EmailBuilder(),
-            "kill": new KillBuilder()
+            "kill": new KillBuilder(),
+            "sub-workflow": new SubWorkflowBuilder()
     ]
 
     def String buildWorkflow(Workflow wf) {

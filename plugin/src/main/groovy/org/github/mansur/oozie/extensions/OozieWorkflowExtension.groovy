@@ -9,6 +9,7 @@ import org.github.mansur.oozie.beans.FsChmodNode
 import org.github.mansur.oozie.beans.FsMoveNode
 import org.github.mansur.oozie.beans.FsNode
 import org.github.mansur.oozie.beans.HiveNode
+import org.github.mansur.oozie.beans.SubWorkflowNode
 import org.github.mansur.oozie.beans.JavaNode
 import org.github.mansur.oozie.beans.JoinNode
 import org.github.mansur.oozie.beans.KillNode
@@ -31,6 +32,7 @@ class OozieWorkflowExtension {
     Map<String, Map<String, String>> credentials
     File outputDir
 
+    def SubWorkflowNode subWorkflow(params) { new SubWorkflowNode(params) }
     def HiveNode hive(params) { new HiveNode(params) }
     def PigNode pig(params) { new PigNode(params) }
     def JavaNode java(params) { new JavaNode(params) }
