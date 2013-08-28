@@ -5,7 +5,7 @@ import groovy.xml.MarkupBuilder;
 import java.util.List;
 import java.util.Map
 
-abstract class HadoopActionNode extends ActionNode implements NodeBuilder {
+abstract class HadoopActionNode extends ActionNode {
   private static final long serialVersionUID = 1L
 
   String jobTracker

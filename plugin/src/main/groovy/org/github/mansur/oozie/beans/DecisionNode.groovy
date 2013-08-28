@@ -4,7 +4,7 @@ import groovy.xml.MarkupBuilder;
 
 import java.util.Map;
 
-class DecisionNode extends WorkflowNode implements NodeBuilder {
+class DecisionNode extends WorkflowNode {
   private static final long serialVersionUID = 1L
 
   List<DecisionCaseNode> cases;

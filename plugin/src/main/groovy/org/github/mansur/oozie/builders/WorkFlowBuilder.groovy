@@ -18,8 +18,8 @@ package org.github.mansur.oozie.builders
 
 import groovy.xml.MarkupBuilder
 
-import org.github.mansur.oozie.beans.NodeBuilder;
 import org.github.mansur.oozie.beans.Workflow
+import org.github.mansur.oozie.beans.WorkflowNode
 
 /**
  * @author Muhammad Ashraf
@@ -65,7 +65,7 @@ class WorkFlowBuilder {
             start(to: graph.findHead())
             graph.tSort().each {
                 def action = findAction(it.toString(), actions)
-                if (action instanceof NodeBuilder) {
+                if (action instanceof WorkflowNode) {
                   action.buildXml(workflow, wf.common)
                 }
                 else {

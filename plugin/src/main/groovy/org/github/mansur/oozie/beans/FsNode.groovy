@@ -4,7 +4,7 @@ import groovy.xml.MarkupBuilder;
 
 import java.util.Map;
 
-class FsNode extends ActionNode implements NodeBuilder {
+class FsNode extends ActionNode {
   List<String> delete
   List<String> mkdir
   List<FsMoveNode> move

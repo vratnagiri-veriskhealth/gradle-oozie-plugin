@@ -5,7 +5,7 @@ import groovy.xml.MarkupBuilder;
 import java.util.HashMap;
 import java.util.Map;
 
-class JoinNode extends WorkflowNode implements NodeBuilder {
+class JoinNode extends WorkflowNode {
   String to
 
   @Override

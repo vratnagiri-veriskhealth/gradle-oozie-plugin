@@ -26,7 +26,7 @@ import java.util.List;
  * @author Muhammad Ashraf
  * @since 7/23/13
  */
-class EmailNode extends ActionNode implements NodeBuilder {
+class EmailNode extends ActionNode {
   private static final long serialVersionUID = 1L
 
   String to

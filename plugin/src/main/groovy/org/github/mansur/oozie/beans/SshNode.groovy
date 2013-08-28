@@ -4,7 +4,7 @@ import groovy.xml.MarkupBuilder;
 
 import java.util.Map
 
-class SshNode extends ActionNode implements NodeBuilder {
+class SshNode extends ActionNode {
   private static final long serialVersionUID = 1L
 
   String host

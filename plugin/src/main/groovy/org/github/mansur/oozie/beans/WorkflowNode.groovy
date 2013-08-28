@@ -11,6 +11,8 @@ abstract class WorkflowNode implements Serializable {
 
   String name
 
+  public abstract void buildXml(MarkupBuilder xml, CommonProperties common);
+
   protected Map<String, String> prune(Map<String, String> map) {
     map.findAll { it.value != null }
   }

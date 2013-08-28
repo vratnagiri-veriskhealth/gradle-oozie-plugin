@@ -4,7 +4,7 @@ import groovy.xml.MarkupBuilder;
 
 import java.util.Map;
 
-class KillNode extends WorkflowNode implements NodeBuilder {
+class KillNode extends WorkflowNode {
   private static final long serialVersionUID = 1L
 
   String message

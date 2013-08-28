@@ -4,7 +4,7 @@ import groovy.xml.MarkupBuilder;
 
 import java.util.Map;
 
-class ForkNode extends WorkflowNode implements NodeBuilder {
+class ForkNode extends WorkflowNode {
   private static final long serialVersionUID = 1L
 
   List<String> paths
