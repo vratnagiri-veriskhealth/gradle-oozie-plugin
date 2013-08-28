@@ -72,6 +72,7 @@ class WorkFlowBuilder {
                   action = asMap(action)
                   def type = action.get("type")
                   def builder = findBuilder(type)
+                  println("using maps to specify workflow nodes is deprecated; please convert the map of type ${type}")
                   builder.buildXML(workflow, action, asMap(wf.common))
                 }
             }
