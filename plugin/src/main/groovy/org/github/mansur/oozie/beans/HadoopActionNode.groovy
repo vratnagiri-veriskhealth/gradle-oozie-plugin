@@ -5,7 +5,7 @@ import groovy.xml.MarkupBuilder;
 import java.util.List;
 import java.util.Map
 
-abstract class HadoopActionNode extends ActionNode {
+abstract class HadoopActionNode extends ActionNode implements NodeBuilder {
   private static final long serialVersionUID = 1L
 
   String jobTracker
@@ -30,25 +30,10 @@ abstract class HadoopActionNode extends ActionNode {
       archive: archive]
   }
 
-  private void addPrepareNodes(MarkupBuilder xml, List<String> deletes, List<String> dirs) {
-    if (deletes != null || dirs != null) {
-        xml.prepare {
-            addDeleteOrDir(xml, deletes, DELETE)
-            addDeleteOrDir(xml, dirs, MKDIR)
-        }
-    }
-  }
-
   protected void hadoopActionXml(MarkupBuilder xml, CommonProperties common, Closure actionSpecific) {
     xml.'job-tracker'(jobTracker ?: common.jobTracker)
     xml.'name-node'(nameNode ?: common.nameNode)
-    // prepare nodes
-    if ((delete ?: mkdir) != null) {
-      xml.prepare {
-        delete?.each { xml.delete(path: it) }
-        mkdir?.each { xml.mkdir(path: it) }
-      }
-    }
+    prepareNodes(xml, delete, mkdir)
     xml.'job-xml'(jobXml ?: common.jobXml)
     addProperties(xml, 'configuration', configuration ?: common.configuration)
     actionSpecific.call()

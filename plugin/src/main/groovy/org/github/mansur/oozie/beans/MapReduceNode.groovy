@@ -1,5 +1,7 @@
 package org.github.mansur.oozie.beans
 
+import groovy.xml.MarkupBuilder;
+
 import java.util.Map;
 
 class MapReduceNode extends HadoopActionNode {
@@ -8,5 +10,14 @@ class MapReduceNode extends HadoopActionNode {
   @Override
   protected Map<String, String> rawMap() {
     return super.rawMap() + [type: 'mapreduce']
+  }
+
+  @Override
+  public void buildXml(MarkupBuilder xml, CommonProperties common) {
+    actionXml(xml, common) {
+      xml.'map-reduce' {
+        hadoopActionXml(xml, common) {}
+      }
+    }
   }
 }

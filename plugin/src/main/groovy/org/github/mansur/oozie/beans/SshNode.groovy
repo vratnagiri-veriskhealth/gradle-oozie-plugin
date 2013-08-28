@@ -1,8 +1,10 @@
 package org.github.mansur.oozie.beans
 
+import groovy.xml.MarkupBuilder;
+
 import java.util.Map
 
-class SshNode extends ActionNode {
+class SshNode extends ActionNode implements NodeBuilder {
   private static final long serialVersionUID = 1L
 
   String host
@@ -13,6 +15,18 @@ class SshNode extends ActionNode {
   @Override
   protected Map<String, String> rawMap() {
     super.rawMap() + [ type: 'ssh', host: host, command: command, args: args ] +
-      (captureOutput == null ? [:] : [captureOutput : captureOutput])
+      CapturingUtils.captureMapEntry(captureOutput)
+  }
+
+  @Override
+  public void buildXml(MarkupBuilder xml, CommonProperties common) {
+    actionXml(xml, common) {
+      xml.'shell'() {
+        xml.'host'(host)
+        xml.'command'(command)
+        args?.each { xml.'args'(it) }
+        CapturingUtils.captureOutputNode(xml, captureOutput)
+      }
+    }
   }
 }

@@ -1,5 +1,7 @@
 package org.github.mansur.oozie.beans
 
+import groovy.xml.MarkupBuilder;
+
 import java.util.Map;
 
 abstract class CapturingHadoopActionNode extends HadoopActionNode {
@@ -9,6 +11,6 @@ abstract class CapturingHadoopActionNode extends HadoopActionNode {
 
   @Override
   protected Map<String, String> rawMap() {
-    return super.rawMap() + (captureOutput == null ? [:] : [captureOutput: captureOutput])
+    return super.rawMap() + CapturingUtils.captureMapEntry(captureOutput)
   }
 }

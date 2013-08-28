@@ -18,6 +18,7 @@ public class CommonProperties {
   String emailTo
   String emailCc
   Boolean propagateConfiguration
+  String javaOpts
 
   final Map<String, String> toMap() {
     [
@@ -32,7 +33,9 @@ public class CommonProperties {
       params: params,
       host: sshHost,
       to: emailTo,
-      cc: emailCc
+      cc: emailCc,
+      propagateConfiguration: propagateConfiguration,
+      javaOpts: javaOpts
     ].findAll { it.value != null }
   }
 }
