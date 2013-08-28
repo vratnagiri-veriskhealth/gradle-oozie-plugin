@@ -18,6 +18,7 @@ package org.github.mansur.oozie.builders
 
 import groovy.xml.MarkupBuilder
 
+import org.github.mansur.oozie.beans.NodeBuilder;
 import org.github.mansur.oozie.beans.Workflow
 
 /**
@@ -64,9 +65,15 @@ class WorkFlowBuilder {
             start(to: graph.findHead())
             graph.tSort().each {
                 def action = findAction(it.toString(), actions)
-                def type = action.get("type")
-                def builder = findBuilder(type)
-                builder.buildXML(workflow, action, asMap(wf.common))
+                if (action instanceof NodeBuilder) {
+                  action.buildXml(workflow, wf.common)
+                }
+                else {
+                  action = asMap(action)
+                  def type = action.get("type")
+                  def builder = findBuilder(type)
+                  builder.buildXML(workflow, action, asMap(wf.common))
+                }
             }
             end(name: wf.end)
         }
@@ -105,7 +112,7 @@ class WorkFlowBuilder {
             if (nodeName == endName) {
               return;
             }
-            def action = findAction(nodeName, actions)
+            def action = asMap(findAction(nodeName, actions))
             def type = action.get("type")
             if (type == "fork") {
                 handleFork(action, nodesMap, n)
@@ -189,8 +196,8 @@ class WorkFlowBuilder {
     private Map asMap(Object o) {
       return (o instanceof Map || o == null) ? o : o.toMap();
     }
-    private Map<String, Object> findAction(String name, List<Object> actions) {
-        asMap(actions.find { name == asMap(it).get("name") })
+    private Object findAction(String name, List<Object> actions) {
+        actions.find { name == asMap(it).get("name") }
     }
 
     def Object findBuilder(String type) {

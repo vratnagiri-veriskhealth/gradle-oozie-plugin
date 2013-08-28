@@ -8,6 +8,7 @@ public class CommonProperties {
   String jobTracker
   String nameNode
   String jobXml
+  String error
   List<String> delete
   List<String> mkdir
   List<String> file
@@ -18,6 +19,7 @@ public class CommonProperties {
   String sshHost
   String emailTo
   String emailCc
+  Boolean propagateConfiguration
 
   final Map<String, String> toMap() {
     [
@@ -25,6 +27,7 @@ public class CommonProperties {
       jobTracker: jobTracker,
       namenode: nameNode,
       jobXML: jobXml,
+      error: error,
       delete: delete,
       mkdir: mkdir,
       file: file,

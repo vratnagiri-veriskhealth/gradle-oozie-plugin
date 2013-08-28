@@ -26,7 +26,7 @@ import java.util.List;
  * @author Muhammad Ashraf
  * @since 7/23/13
  */
-class EmailNode extends ActionNode {
+class EmailNode extends ActionNode implements NodeBuilder {
   private static final long serialVersionUID = 1L
 
   String to
@@ -36,5 +36,17 @@ class EmailNode extends ActionNode {
 
   protected Map<String, String> rawMap() {
     super.rawMap() + [ type: 'email', to: to, cc: cc, subject: subject, body:body ]
+  }
+
+  @Override
+  public void buildXml(MarkupBuilder xml, CommonProperties common) {
+    actionXml(xml, common) {
+      xml.'email'(xmlns:"uri:oozie:email-action:0.1") {
+        addNode(xml, 'to', to ?: common.emailTo)
+        addNode(xml, 'cc', cc ?: common.emailCc)
+        addNode(xml, 'subject', subject)
+        addNode(xml, 'body', body)
+      }
+    }
   }
 }
