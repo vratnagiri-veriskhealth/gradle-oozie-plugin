@@ -9,8 +9,6 @@ public class CommonProperties {
   String nameNode
   String jobXml
   String error
-  List<String> delete
-  List<String> mkdir
   List<String> file
   List<String> archive
   Map<String, String> configuration
@@ -28,8 +26,6 @@ public class CommonProperties {
       namenode: nameNode,
       jobXML: jobXml,
       error: error,
-      delete: delete,
-      mkdir: mkdir,
       file: file,
       archive: archive,
       configuration: configuration,
