@@ -10,7 +10,7 @@ class SubWorkflowNode extends ActionNode {
   private static final long serialVersionUID = 1L
 
   String appPath
-  Boolean propagateConfiguration;
+  Boolean propagateConfiguration
   Map<String, String> configuration
 
   @Override
