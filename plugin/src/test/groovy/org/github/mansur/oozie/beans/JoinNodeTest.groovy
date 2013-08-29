@@ -9,8 +9,8 @@ class JoinNodeTest {
   @Test
   public void test() {
     assertEquals(
-      [type: 'join', name: 'my join', to: 'andThen'],
-      new JoinNode(name: 'my join', to: 'andThen').toMap()
+      [type: 'join', name: 'myJoin', to: 'andThen'],
+      new JoinNode(name: 'myJoin', to: 'andThen').toMap()
     )
   }
 

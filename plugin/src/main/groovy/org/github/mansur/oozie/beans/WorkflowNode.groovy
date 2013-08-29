@@ -11,6 +11,10 @@ abstract class WorkflowNode implements Serializable {
 
   String name
 
+  public void setName(String name) {
+    this.name = NameChecker.verify(name)
+  }
+
   public abstract void buildXml(MarkupBuilder xml, CommonProperties common);
 
   protected Map<String, String> prune(Map<String, String> map) {

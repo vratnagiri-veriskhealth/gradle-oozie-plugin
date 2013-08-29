@@ -7,7 +7,7 @@ import org.junit.Test;
 class AbstractHadoopActionNodeTest {
   private Map<String, Object> common =
   [
-    name: 'my action',
+    name: 'myAction',
     cred: 'trust me',
     ok: 'next',
     error: 'ack!!',
