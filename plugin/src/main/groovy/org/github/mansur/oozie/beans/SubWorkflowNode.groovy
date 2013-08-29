@@ -24,7 +24,7 @@ class SubWorkflowNode extends ActionNode {
       xml.'sub-workflow' {
         'app-path'(appPath)
         if (propagateConfiguration ?: common.propagateConfiguration ?: false) {
-          xml.'propagate-configuration'
+          xml.'propagate-configuration'()
         }
         addProperties(xml, 'configuration', configuration ?: common.configuration)
       }

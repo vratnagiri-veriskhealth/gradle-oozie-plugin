@@ -31,7 +31,7 @@ class OozieWorkflowExtension {
     Object common
     HashMap<String, Object> jobXML
     List<HashMap<String, Object>> actions
-    Map<String, Map<String, String>> credentials
+    Object credentials
     File outputDir
 
     def SubWorkflowNode subWorkflow(params) { new SubWorkflowNode(params) }

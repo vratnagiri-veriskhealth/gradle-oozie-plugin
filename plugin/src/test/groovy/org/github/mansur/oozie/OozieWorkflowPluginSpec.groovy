@@ -408,6 +408,14 @@ class OozieWorkflowPluginSpec extends Specification {
             end = "end_node"
             name = 'oozie_flow'
             namespace = 'uri:oozie:workflow:0.1'
+            credentials = [
+              hcatCredentials(
+                name: 'hive_credentials',
+                metastoreUri: "thrift://localhost:9083/",
+                metastorePrincipal: "hive/_HOST@DOMAIN"
+              )
+            ]
+
         }
 
         project.task(TASK_NAME, type: OozieWorkflowTask)
