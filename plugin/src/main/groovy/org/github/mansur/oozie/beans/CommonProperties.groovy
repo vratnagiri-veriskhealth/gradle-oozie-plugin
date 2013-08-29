@@ -3,7 +3,9 @@ package org.github.mansur.oozie.beans;
 import java.util.List;
 import java.util.Map;
 
-public class CommonProperties {
+public class CommonProperties implements Serializable {
+  private static final long serialVersionUID = 1L
+
   String cred
   String jobTracker
   String nameNode

@@ -1,6 +1,8 @@
 package org.github.mansur.oozie.beans
 
-class HcatCredentialNode {
+class HcatCredentialNode implements CredentialNode {
+  private static final long serialVersionUID = 1L
+
   String name;
   String metastoreUri;
   String metastorePrincipal

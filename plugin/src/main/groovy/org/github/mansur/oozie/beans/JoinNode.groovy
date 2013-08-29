@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 class JoinNode extends WorkflowNode {
+  private static final long serialVersionUID = 1L
+
   String to
 
   @Override
