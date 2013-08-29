@@ -9,6 +9,7 @@ import org.github.mansur.oozie.beans.ForkNode
 import org.github.mansur.oozie.beans.FsChmodNode
 import org.github.mansur.oozie.beans.FsMoveNode
 import org.github.mansur.oozie.beans.FsNode
+import org.github.mansur.oozie.beans.HcatCredentialNode
 import org.github.mansur.oozie.beans.HiveNode
 import org.github.mansur.oozie.beans.SubWorkflowNode
 import org.github.mansur.oozie.beans.JavaNode
@@ -54,4 +55,5 @@ class OozieWorkflowExtension {
     def JoinNode join(params) { new JoinNode(params) }
     def JoinNode join(String name, String to) { new JoinNode(name: name, to: to) }
     def CommonProperties common(params) { new CommonProperties(params) }
+    def HcatCredentialNode hcatCredentials(params) { new HcatCredentialNode(params) }
 }

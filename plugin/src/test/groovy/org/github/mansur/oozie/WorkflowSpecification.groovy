@@ -245,13 +245,11 @@ class WorkflowSpecification extends Specification {
         )
 
         def credentials = [
-          new CredentialNode(
+          new HcatCredentialNode(
             name: 'hive_credentials',
-            type: 'hcat',
-            properties: [
-              "hcat.metastore.uri": "thrift://localhost:9083/",
-              "hcat.metastore.principal": "hive/_HOST@DOMAIN"
-            ])
+            hcatMetastoreUri: "thrift://localhost:9083/",
+            hcatMetastorePrincipal: "hive/_HOST@DOMAIN"
+          )
         ]
 
         def shell_to_prod = new ShellNode(
