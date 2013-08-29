@@ -30,5 +30,5 @@ class Workflow {
     Object common
     HashMap<String, Object> jobXML
     List<Map<String, Object>> actions
-    Map<String, Map<String, Object>> credentials
+    Object credentials
 }

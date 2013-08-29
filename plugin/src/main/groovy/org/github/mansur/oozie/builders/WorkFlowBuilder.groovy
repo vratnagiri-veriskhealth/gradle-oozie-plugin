@@ -18,6 +18,7 @@ package org.github.mansur.oozie.builders
 
 import groovy.xml.MarkupBuilder
 
+import org.github.mansur.oozie.beans.CredentialNode
 import org.github.mansur.oozie.beans.Workflow
 import org.github.mansur.oozie.beans.WorkflowNode
 
@@ -48,14 +49,31 @@ class WorkFlowBuilder {
         def writer = new StringWriter()
         def workflow = new MarkupBuilder(writer)
         workflow.'workflow-app'('xmlns': "$wf.namespace", name: "$wf.name") {
-            if (wf.credentials != null && !wf.credentials.isEmpty()) {
-              credentials {
-                wf.credentials.each { k, v ->
-                  credential(name: k, type: v.get("type")) {
-                    v.get("configuration").each { propertyName, propertyValue ->
-                      property {
-                        name(propertyName)
-                        value(propertyValue)
+            if (wf.credentials != null) {
+              if (wf.credentials instanceof Map && ! wf.credentials.isEmpty()) {
+                credentials {
+                  wf.credentials.each { k, v ->
+                    credential(name: k, type: v.get("type")) {
+                      v.get("configuration").each { propertyName, propertyValue ->
+                        property {
+                          name(propertyName)
+                          value(propertyValue)
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              else if (wf.credentials instanceof List && !wf.credentials.isEmpty()) {
+                List<CredentialNode> credentialNodes = wf.credentials;
+                'credentials' {
+                  credentialNodes.each { cred ->
+                    credential(name: cred.name, type: cred.type) {
+                      cred.properties?.each { propertyName, propertyValue ->
+                        property {
+                          name(propertyName)
+                          value(propertyValue)
+                        }
                       }
                     }
                   }
