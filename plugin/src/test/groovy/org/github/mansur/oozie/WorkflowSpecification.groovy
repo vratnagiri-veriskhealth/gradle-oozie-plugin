@@ -4,6 +4,7 @@ import org.custommonkey.xmlunit.Diff
 import org.custommonkey.xmlunit.XMLUnit
 import org.github.mansur.oozie.beans.*
 import org.github.mansur.oozie.builders.WorkFlowBuilder
+import org.github.mansur.oozie.extensions.OozieWorkflowExtension
 import spock.lang.Specification
 
 /**
@@ -235,24 +236,25 @@ class WorkflowSpecification extends Specification {
 
     def "WorkFlow dsl should be able to create a valid oozie xml Spec using beans"() {
         when:
+        def oozie = new OozieWorkflowExtension()
         def jobTracker = "http://jobtracker"
         def namenode = "http://namenode"
 
-        def common = new CommonProperties(
+        def common = oozie.common(
           jobTracker: "$jobTracker",
           nameNode: "$namenode",
           jobXml: "dev_prop.xml"
         )
 
         def credentials = [
-          new HcatCredentialNode(
+          oozie.hcatCredentials(
             name: 'hive_credentials',
-            hcatMetastoreUri: "thrift://localhost:9083/",
-            hcatMetastorePrincipal: "hive/_HOST@DOMAIN"
+            metastoreUri: "thrift://localhost:9083/",
+            metastorePrincipal: "hive/_HOST@DOMAIN"
           )
         ]
 
-        def shell_to_prod = new ShellNode(
+        def shell_to_prod = oozie.shell(
                 name: "shell_to_prod",
                 ok: "fork_flow",
                 error: "fail",
@@ -279,19 +281,19 @@ class WorkflowSpecification extends Specification {
                 ]
         )
 
-        def move_files = new FsNode(
+        def move_files = oozie.fs(
                 name: "move_files",
                 ok: "join_flow",
                 error: "fail",
                 delete: ["hdfs://foo:9000/usr/tucu/temp-data"],
                 mkdir: ['archives/${wf:id()}'],
-                move: [ new FsMoveNode( source: '${jobInput}', target: 'archives/${wf:id()}/processed-input' ),
-                        new FsMoveNode( source: '${jobInput}', target: 'archives/${wf:id()}/raw-input' ) ],
+                move: [ oozie.fsMove( source: '${jobInput}', target: 'archives/${wf:id()}/processed-input' ),
+                        oozie.fsMove( source: '${jobInput}', target: 'archives/${wf:id()}/raw-input' ) ],
 
-                chmod: [ new FsChmodNode( path: '${jobOutput}', permissions: '-rwxrw-rw-', dirFiles: true ) ]
+                chmod: [ oozie.fsChmod( path: '${jobOutput}', permissions: '-rwxrw-rw-', dirFiles: true ) ]
         )
 
-        def mahout_pfpgrowth = new JavaNode(
+        def mahout_pfpgrowth = oozie.java(
                 name: "mahout_fp_growth",
                 delete: ["${jobTracker}/pattern"],
                 mainClass: "some.random.class",
@@ -310,7 +312,7 @@ class WorkflowSpecification extends Specification {
                         "50"
                 ])
 
-        def fork_flow = new ForkNode(
+        def fork_flow = oozie.fork(
                 name: "fork_flow",
                 paths: [
                         "move_files",
@@ -318,9 +320,9 @@ class WorkflowSpecification extends Specification {
                 ]
         )
 
-        def join_flow = new JoinNode( name: "join_flow", to: "pig_job" )
+        def join_flow = oozie.join( name: "join_flow", to: "pig_job" )
 
-        def pig_job = new PigNode(
+        def pig_job = oozie.pig(
                 name: "pig_job",
                 delete: ["${jobTracker}/pattern"],
                 jobXml: "job.xml",
@@ -339,7 +341,7 @@ class WorkflowSpecification extends Specification {
                         "50"
                 ])
 
-        def sub_workflow_job = new SubWorkflowNode(
+        def sub_workflow_job = oozie.subWorkflow(
           name: "sub_workflow_job",
           appPath: "hdfs://foo:9000/usr/tucu/temp-data",
           ok: "hive_job",
@@ -350,7 +352,7 @@ class WorkflowSpecification extends Specification {
           ]
         )
 
-        def hive_job = new HiveNode(
+        def hive_job = oozie.hive(
                 name: "hive_job",
                 delete: ["${jobTracker}/pattern"],
                 jobXml: "job.xml",
@@ -364,7 +366,7 @@ class WorkflowSpecification extends Specification {
                 params: [ schema: 'standard', otherParam: 'other value' ]
         )
 
-        def authenticated_hive_job = new HiveNode(
+        def authenticated_hive_job = oozie.hive(
                 name: "authenticated_hive_job",
                 cred: "hive_credentials",
                 delete: ["${jobTracker}/pattern"],
@@ -379,7 +381,7 @@ class WorkflowSpecification extends Specification {
                 params: [ schema: 'standard', otherParam: 'other value' ]
         )
 
-        def first_map_reduce = new MapReduceNode(
+        def first_map_reduce = oozie.mapReduce(
                 name: "first_map_reduce",
                 delete: ["${jobTracker}/pattern"],
                 jobXml: "job.xml",
@@ -391,7 +393,7 @@ class WorkflowSpecification extends Specification {
                 ]
         )
 
-        def flow_decision = new DecisionNode(
+        def flow_decision = oozie.decision(
                 name: "flow_decision",
                 cases: [ new DecisionCaseNode(to: 'end_node', condition: 'some condition'),
                          new DecisionCaseNode(to: 'first_map_reduce', condition: 'some other condition'),
@@ -399,7 +401,7 @@ class WorkflowSpecification extends Specification {
                 defaultCase: "end_node"
         )
 
-        def fail = new KillNode(
+        def fail = oozie.kill(
                 name: "fail",
                 message: "workflow failed!"
         )

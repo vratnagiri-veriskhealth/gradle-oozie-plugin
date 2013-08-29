@@ -2,12 +2,12 @@ package org.github.mansur.oozie.beans
 
 class HcatCredentialNode {
   String name;
-  String hcatMetastoreUri;
-  String hcatMetastorePrincipal
+  String metastoreUri;
+  String metastorePrincipal
 
   String getType() { 'hcat' }
   Map <String, String> getProperties() {
-    [ "hcat.metastore.uri": hcatMetastoreUri,
-      "hcat.metastore.principal":  hcatMetastorePrincipal ]
+    [ "hcat.metastore.uri": metastoreUri,
+      "hcat.metastore.principal":  metastorePrincipal ]
   }
 }
