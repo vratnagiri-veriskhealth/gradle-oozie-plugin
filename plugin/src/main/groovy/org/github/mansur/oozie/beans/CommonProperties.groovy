@@ -21,6 +21,7 @@ public class CommonProperties implements Serializable {
   String emailCc
   Boolean propagateConfiguration
   String javaOpts
+  List<CredentialNode> credentials
 
   final Map<String, String> toMap() {
     [
