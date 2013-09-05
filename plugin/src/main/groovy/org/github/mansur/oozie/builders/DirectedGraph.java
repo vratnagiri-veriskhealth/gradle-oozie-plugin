@@ -36,6 +36,7 @@ public class DirectedGraph {
     public List<Node> tSort() {
       // Kahn's algorithm; see http://en.wikipedia.org/wiki/Topological_sorting#Algorithms
       List<Node> result = new ArrayList<>();
+      if (nodes.isEmpty()) { return result; }
       Set<Node> toProcess = new HashSet<>();
       toProcess.add(findHead());
       while(!toProcess.isEmpty()) {

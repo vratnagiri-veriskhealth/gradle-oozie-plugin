@@ -81,7 +81,7 @@ class WorkFlowBuilder {
                 }
               }
             }
-            start(to: graph.findHead())
+            start(to: actions.isEmpty() ? wf.end : graph.findHead())
             graph.tSort().each {
                 def action = findAction(it.toString(), actions)
                 if (action instanceof WorkflowNode) {
