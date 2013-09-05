@@ -49,11 +49,10 @@ class WorkFlowBuilder {
         def writer = new StringWriter()
         def workflow = new MarkupBuilder(writer)
         workflow.'workflow-app'('xmlns': "$wf.namespace", name: "$wf.name") {
-            Object credentials = wf.credentials ?: wf.common.credentials
-            if (credentials != null) {
-              if (credentials instanceof Map && ! credentials.isEmpty()) {
+            if (wf.credentials != null) {
+              if (wf.credentials instanceof Map && ! wf.credentials.isEmpty()) {
                 workflow.'credentials' {
-                  credentials.each { k, v ->
+                  wf.credentials.each { k, v ->
                     credential(name: k, type: v.get("type")) {
                       v.get("configuration").each { propertyName, propertyValue ->
                         property {
@@ -65,8 +64,8 @@ class WorkFlowBuilder {
                   }
                 }
               }
-              else if (credentials instanceof List && !credentials.isEmpty()) {
-                List<CredentialNode> credentialNodes = credentials;
+              else if (wf.credentials instanceof List && !wf.credentials.isEmpty()) {
+                List<CredentialNode> credentialNodes = wf.credentials;
                 workflow.'credentials' {
                   credentialNodes.each { cred ->
                     credential(name: cred.name, type: cred.type) {
