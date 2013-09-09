@@ -7,9 +7,10 @@ import static org.junit.Assert.fail;
 
 class BuilderTestUtils {
 
-  static void assertXml(WorkflowNode node, String expectedXml) {
+  static void assertXml(
+    WorkflowNode node, String expectedXml, CommonProperties commonProperties = new CommonProperties()) {
     def stringWriter = new StringWriter()
-    node.buildXml(new MarkupBuilder(new PrintWriter(stringWriter)), new CommonProperties());
+    node.buildXml(new MarkupBuilder(new PrintWriter(stringWriter)), commonProperties);
 
     XMLUnit.setIgnoreWhitespace(true)
     def xmlDiff = new Diff(
