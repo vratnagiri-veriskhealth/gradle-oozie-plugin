@@ -30,8 +30,12 @@ class FsNode extends ActionNode {
         move?.each {
           xml.'move'(source: it.source, target: it.target)
         }
-        chmod?.each {
-          xml.'chmod'(path: it.path, permissions: it.permissions, 'dir-files': it.dirFiles)
+        chmod?.each { chmod ->
+          xml.'chmod'(path: chmod.path, permissions: chmod.permissions, 'dir-files': chmod.dirFiles) {
+            if (chmod.recursive) {
+              xml.'recursive'()
+            }
+          }
         }
       }
     }

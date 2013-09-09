@@ -34,7 +34,7 @@ class FsNodeTest {
         delete: ['a', 'b'],
         mkdir: ['c', 'd'],
         move: [new FsMoveNode(source: 'from', target: 'to')],
-        chmod: [new FsChmodNode(path: 'change', permissions: 'rwx', dirFiles: false),
+        chmod: [new FsChmodNode(path: 'change', permissions: 'rwx', recursive: true),
                 new FsChmodNode(path: 'simple', permissions: '666', dirFiles: true)],
         ok: 'next',
         error: 'fail'),
@@ -46,7 +46,7 @@ class FsNodeTest {
       <mkdir path='c' />
       <mkdir path='d' />
       <move source='from' target='to' />
-      <chmod path='change' permissions='rwx' dir-files='false' />
+      <chmod path='change' permissions='rwx' dir-files='false'><recursive /></chmod>
       <chmod path='simple' permissions='666' dir-files='true' />
     </fs>
     <ok to='next' />

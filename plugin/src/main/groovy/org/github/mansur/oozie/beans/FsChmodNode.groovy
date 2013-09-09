@@ -6,6 +6,7 @@ class FsChmodNode implements Serializable {
   String path
   String permissions
   boolean dirFiles
+  boolean recursive
 
 
   Map<String, String> toMap() {
