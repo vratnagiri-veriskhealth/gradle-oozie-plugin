@@ -21,7 +21,7 @@ class SshNode extends ActionNode {
   @Override
   public void buildXml(MarkupBuilder xml, CommonProperties common) {
     actionXml(xml, common) {
-      xml.'shell'() {
+      xml.'ssh'() {
         xml.'host'(host)
         xml.'command'(command)
         args?.each { xml.'args'(it) }
