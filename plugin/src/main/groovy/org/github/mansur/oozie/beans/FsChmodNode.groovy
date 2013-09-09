@@ -5,7 +5,8 @@ class FsChmodNode implements Serializable {
 
   String path
   String permissions
-  Boolean dirFiles
+  boolean dirFiles
+
 
   Map<String, String> toMap() {
     def result = [ path: path, permissions: permissions ]
