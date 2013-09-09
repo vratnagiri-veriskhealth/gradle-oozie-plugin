@@ -15,6 +15,5 @@ class KillNodeTest {
   @Test
   public void testBuildXml() {
     assertXml(new KillNode(name: 'fail', message: 'hello'), "<kill name='fail'> <message>hello</message> </kill>")
-
   }
 }
