@@ -37,4 +37,20 @@ class SshNodeTest {
 """)
   }
 
+  @Test
+  public void testBuildXmlCaptureOuptut() {
+    assertXml(
+      new SshNode(args + [captureOutput: true]), """
+  <action name="remote">
+    <ssh>
+      <host>example.com</host>
+      <command>ls</command>
+      <args>/foo</args>
+      <capture-output/>
+    </ssh>
+    <ok to="next"/>
+    <error to="fail"/>
+  </action>
+""")
+  }
 }
