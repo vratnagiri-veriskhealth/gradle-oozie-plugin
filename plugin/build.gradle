@@ -13,26 +13,23 @@
  *    limitations under the License.
  */
 
-
-
-
-
 apply plugin: "java"
 apply plugin: "groovy"
 apply plugin: 'maven'
 
 group = "org.github.mansur.oozie"
 
+buildscript {
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
+}
+
+
 configurations {
     deployerJars
 }
-ext {
-    cloudbees = [:]
-}
-cloudbees += [
-        user_name: "$System.env.cb_username",
-        password: "$System.env.cb_password"
-]
 
 repositories {
     mavenCentral()
@@ -44,24 +41,35 @@ dependencies {
     testCompile "org.easytesting:fest-assert-core:2.0M10",
     testCompile('org.spockframework:spock-core:0.7-groovy-' + groovy.lang.GroovySystem.getVersion().substring(0,3))
     testCompile 'xmlunit:xmlunit:1.4'
-    deployerJars 'org.apache.maven.wagon:wagon-webdav:1.0-beta-2'
+//    deployerJars 'org.apache.maven.wagon:wagon-webdav:1.0-beta-2'
+    deployerJars 'org.apache.maven.wagon:wagon-http:2.2'
+}
 
-}
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: "file://$projectDir/../repo")
-        }
+task getUploadCredentials << {
+  def console = System.console()
+  def username
+  def password
+  if (console == null) {
+    throw new Exception("no console (consider passing --no-daemon to gradle)")
+  }
+  else {
+    console.println ();
+    uploadArchives.repositories.mavenDeployer.repository.with {
+      authentication.userName = console.readLine('Deploy username: ');
+      authentication.password = new String(console.readPassword('Deploy password: '));
     }
+  }
 }
+
+uploadArchives.dependsOn(getUploadCredentials)
+
 uploadArchives {
     repositories.mavenDeployer {
-        def configureAuth = {
-            authentication(userName: cloudbees.user_name, password: cloudbees.password)
-        }
         configuration = configurations.deployerJars
-        repository(url: "dav:https://repository-uncommon-configuration.forge.cloudbees.com/release/", configureAuth)
-        snapshotRepository(url: "dav:https://repository-uncommon-configuration.forge.cloudbees.com/snapshot/", configureAuth)
+        repository(url: deployUrl) {
+          authentication()
+        }
+//        snapshotRepository(url: "dav:https://repository-uncommon-configuration.forge.cloudbees.com/snapshot/", configureAuth)
     }
 }
 
