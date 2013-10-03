@@ -27,22 +27,6 @@ import org.github.mansur.oozie.beans.WorkflowNode
  * @since 7/24/13
  */
 class WorkFlowBuilder {
-    HashMap<String, Object> registry = [
-            "java": new JavaBuilder(),
-            "fs": new FSBuilder(),
-            "ssh": new SSHBuilder(),
-            "mapreduce": new MapReduceBuilder(),
-            "shell": new ShellBuilder(),
-            "fork": new ForkBuilder(),
-            "join": new JoinBuilder(),
-            "decision": new DecisionBuilder(),
-            "pig": new PigBuilder(),
-            "hive": new HiveBuilder(),
-            "email": new EmailBuilder(),
-            "kill": new KillBuilder(),
-            "sub-workflow": new SubWorkflowBuilder()
-    ]
-
     def String buildWorkflow(Workflow wf) {
         def actions = wf.actions
         def graph = createDAG(actions, wf.end)
