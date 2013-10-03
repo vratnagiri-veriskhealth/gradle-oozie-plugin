@@ -16,7 +16,7 @@ class ForkNode extends WorkflowNode {
   @Override
   public void buildXml(MarkupBuilder xml, CommonProperties common) {
     xml.fork(name: name) {
-    paths.each { xml.path(start: it) }
+      paths.each { xml.path(start: it) }
     }
   }
 }
