@@ -33,31 +33,15 @@ class WorkFlowBuilder {
         def writer = new StringWriter()
         def workflow = new MarkupBuilder(writer)
         workflow.'workflow-app'('xmlns': "$wf.namespace", name: "$wf.name") {
-            if (wf.credentials != null) {
-              if (wf.credentials instanceof Map && ! wf.credentials.isEmpty()) {
-                workflow.'credentials' {
-                  wf.credentials.each { k, v ->
-                    credential(name: k, type: v.get("type")) {
-                      v.get("configuration").each { propertyName, propertyValue ->
-                        property {
-                          name(propertyName)
-                          value(propertyValue)
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-              else if (wf.credentials instanceof List && !wf.credentials.isEmpty()) {
-                List<CredentialNode> credentialNodes = wf.credentials;
-                workflow.'credentials' {
-                  credentialNodes.each { cred ->
-                    credential(name: cred.name, type: cred.type) {
-                      cred.properties?.each { propertyName, propertyValue ->
-                        property {
-                          name(propertyName)
-                          value(propertyValue)
-                        }
+            if (wf.credentials != null && !wf.credentials.isEmpty()) {
+              List<CredentialNode> credentialNodes = wf.credentials;
+              workflow.'credentials' {
+                credentialNodes.each { cred ->
+                  credential(name: cred.name, type: cred.type) {
+                    cred.properties?.each { propertyName, propertyValue ->
+                      property {
+                        name(propertyName)
+                        value(propertyValue)
                       }
                     }
                   }
@@ -66,17 +50,7 @@ class WorkFlowBuilder {
             }
             start(to: actions.isEmpty() ? wf.end : graph.findHead())
             graph.tSort().each {
-                def action = findAction(it.toString(), actions)
-                if (action instanceof WorkflowNode) {
-                  action.buildXml(workflow, wf.common)
-                }
-                else {
-                  action = asMap(action)
-                  def type = action.get("type")
-                  def builder = findBuilder(type)
-                  println("using maps to specify workflow nodes is deprecated; please convert the map of type ${type}")
-                  builder.buildXML(workflow, action, asMap(wf.common))
-                }
+              findAction(it.toString(), actions).buildXml(workflow, wf.common)
             }
             if (wf.sla != null) {
               wf.sla.buildXml(workflow, wf.common)
