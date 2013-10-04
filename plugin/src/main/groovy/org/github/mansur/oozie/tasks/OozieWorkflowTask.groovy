@@ -2,7 +2,6 @@ package org.github.mansur.oozie.tasks
 
 import org.github.mansur.oozie.beans.CommonProperties
 import org.github.mansur.oozie.beans.CredentialNode
-import org.github.mansur.oozie.beans.Workflow
 import org.github.mansur.oozie.beans.SlaNode
 import org.github.mansur.oozie.beans.WorkflowNode
 import org.github.mansur.oozie.builders.WorkFlowBuilder
@@ -22,7 +21,7 @@ class OozieWorkflowTask extends DefaultTask {
     @Input String end
     @Input String namespace = 'uri:oozie:workflow:0.1'
     @Input @Optional CommonProperties common
-    @Input HashMap<String, Object> jobXML
+    @Input @Optional HashMap<String, Object> jobXML = [:]
     @Input List<WorkflowNode> workflowActions
     @Input @Optional List<CredentialNode> credentials = null
     @Input File outputDir = project.buildDir
@@ -39,36 +38,25 @@ class OozieWorkflowTask extends DefaultTask {
     }
 
     private void generateWorkflow() {
-        def wf = new Workflow()
-        wf.name = getWorkflowName()
-        wf.end = getEnd()
-        wf.namespace = getNamespace()
-        wf.jobXML = this.getJobXML()
-        wf.actions = getWorkflowActions()
-        wf.common = getCommon()
-        wf.credentials = getCredentials()
-        wf.sla = getSla()
         def builder = new WorkFlowBuilder()
-        generateFlow(builder, wf)
-        generateJobXML(builder, wf)
-
+        generateFlow(builder)
+        generateJobXML(builder)
     }
 
-    private void generateJobXML(WorkFlowBuilder builder, Workflow wf) {
-        def jobXML = builder.buildJobXML(wf.jobXML)
-        if (jobXML != null) {
-            def outputFile = new File(getOutputDir().absolutePath + File.separator + getWorkflowName() + "-config.xml")
-            outputFile.parentFile.mkdirs()
-            println("generating oozie job xml : file://$outputFile")
-            outputFile.write(jobXML)
-        }
+    private void generateJobXML(WorkFlowBuilder builder) {
+      if (! jobXML.isEmpty()) {
+        def outputFile = new File(getOutputDir().absolutePath + File.separator + getWorkflowName() + "-config.xml")
+        outputFile.parentFile.mkdirs()
+        println("generating oozie job xml : file://$outputFile")
+        outputFile.write(builder.buildJobXML(jobXML))
+      }
     }
 
-    private void generateFlow(WorkFlowBuilder builder, Workflow wf) {
+    private void generateFlow(WorkFlowBuilder builder) {
         String xml
 
         try {
-            xml = builder.buildWorkflow(wf)
+            xml = builder.buildWorkflow(this)
         } catch (Exception e) {
             throw new GradleException(e.message, e)
         }

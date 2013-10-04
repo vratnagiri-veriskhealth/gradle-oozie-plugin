@@ -19,16 +19,16 @@ package org.github.mansur.oozie.builders
 import groovy.xml.MarkupBuilder
 
 import org.github.mansur.oozie.beans.CredentialNode
-import org.github.mansur.oozie.beans.Workflow
 import org.github.mansur.oozie.beans.WorkflowNode
+import org.github.mansur.oozie.tasks.OozieWorkflowTask
 
 /**
  * @author Muhammad Ashraf
  * @since 7/24/13
  */
 class WorkFlowBuilder {
-    def String buildWorkflow(Workflow wf) {
-        def actions = wf.actions
+    def String buildWorkflow(OozieWorkflowTask wf) {
+        def actions = wf.getWorkflowActions()
         def graph = createDAG(actions, wf.end)
         def writer = new StringWriter()
         def workflow = new MarkupBuilder(writer)

@@ -2,8 +2,8 @@ package org.github.mansur.oozie.builders;
 
 import org.custommonkey.xmlunit.Diff
 import org.custommonkey.xmlunit.XMLUnit;
+import org.github.mansur.oozie.SAMPLE_XML;
 import org.github.mansur.oozie.beans.CommonProperties
-import org.github.mansur.oozie.beans.Workflow
 import org.gradle.api.Project;
 
 import static org.junit.Assert.*;
@@ -11,32 +11,20 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 class WorkFlowBuilderTest {
-
   @Test
-  public void testBuildWorkflow() {
-    def wf = new Workflow(
-      actions: [],
-      end: "end_node",
-      name: 'oozie_flow',
-      common: new CommonProperties(),
-      namespace: 'uri:oozie:workflow:0.1'
-    )
-
-    String xml = new WorkFlowBuilder().buildWorkflow(wf);
-
-    XMLUnit.setIgnoreWhitespace(true)
-    def xmlDiff = new Diff("""
-<workflow-app xmlns='uri:oozie:workflow:0.1' name='oozie_flow'>
-  <start to='end_node' />
-  <end name='end_node' />
-</workflow-app>
-""",
-      xml)
-    if (!xmlDiff.similar()) {
+  public void testBuildJobXml() {
+    def builder = new WorkFlowBuilder()
+    def jobXML = builder.buildJobXML([
+      "mapred.map.output.compress": "false",
+      "mapred.job.queue.name": "queuename"
+    ])
+   XMLUnit.setIgnoreWhitespace(true)
+   def xmlDiff = new Diff(jobXML, SAMPLE_XML.EXPECTED_JOB_XML)
+   if (!xmlDiff.similar()) {
       println "expected:"
-      new XmlNodePrinter(new PrintWriter(System.out)).print(new XmlParser().parseText(expectedXml))
+      new XmlNodePrinter(new PrintWriter(System.out)).print(new XmlParser().parseText(SAMPLE_XML.EXPECTED_JOB_XML))
       println "actual:"
-      new XmlNodePrinter(new PrintWriter(System.out)).print(new XmlParser().parseText(stringWriter.toString()))
+      new XmlNodePrinter(new PrintWriter(System.out)).print(new XmlParser().parseText(jobXML))
       fail("xml different: ${xmlDiff}")
     }
   }

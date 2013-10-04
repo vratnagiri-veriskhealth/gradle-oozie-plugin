@@ -7,6 +7,8 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.testfixtures.ProjectBuilder
 import spock.lang.Specification
+import org.custommonkey.xmlunit.Diff
+import org.custommonkey.xmlunit.XMLUnit
 
 /**
  * @author Muhammad Ashraf
@@ -24,195 +26,214 @@ class OozieWorkflowPluginSpec extends Specification {
     }
 
     def "Apply oozie plugin with beans"() {
-        expect:
-        project.tasks.findByName(TASK_NAME) == null
+      expect:
+      project.tasks.findByName(TASK_NAME) == null
 
-        when:
-        project.apply plugin: 'oozie'
+      when:
+      project.apply plugin: 'oozie'
+      project.task(TASK_NAME, type: OozieWorkflowTask)
+      OozieWorkflowTask task = project.tasks.findByName(TASK_NAME)
 
-        project.oozie {
-            def jobTracker = "http://jobtracker"
-            def namenode = "http://namenode"
+      def oozie = project.oozie;
+      def jobTracker = "http://jobtracker"
+      def namenode = "http://namenode"
 
-            def common_props = common (
-              jobTracker: "$jobTracker",
-              nameNode: "$namenode",
-              jobXml: "dev_prop.xml"
-            )
+      def credentials = [
+        oozie.hcatCredentials(
+          name: 'hive_credentials',
+          metastoreUri: "thrift://localhost:9083/",
+          metastorePrincipal: "hive/_HOST@DOMAIN"
+        )
+      ]
 
-            def shell_to_prod = shell(
-                name: "shell_to_prod",
-                ok: "fork_flow",
-                error: "fail",
-                delete: ["/tmp/workDir"],
-                mkdir: ["/tmp/workDir"],
-                exec: "ssh test@localhost",
-                captureOutput: true,
-                configuration: [
-                        "mapred.map.output.compress": "false",
-                        "mapred.job.queue.name": "queuename"
-                ],
-                args: [
-                        "input",
-                        "output",
-                        "cache.txt"
-                ],
-                env: [
-                        "java_home"
-                ],
-                file: [
-                        "file1.txt",
-                        "file2.txt"
-                ],
-                archive: [
-                        "job.tar"
-                ]
-            )
+      def shell_to_prod = oozie.shell(
+              name: "shell_to_prod",
+              ok: "fork_flow",
+              error: "fail",
+              delete: ["/tmp/workDir"],
+              mkdir: ["/tmp/workDir"],
+              exec: "ssh test@localhost",
+              captureOutput: true,
+              configuration: [
+                      "mapred.map.output.compress": "false",
+                      "mapred.job.queue.name": "queuename"
+              ],
+              args: [
+                      "input",
+                      "output",
+                      "cache.txt"
+              ],
+              env: [ "java_home" ],
+              file: [
+                      "file1.txt",
+                      "file2.txt"
+              ],
+              archive: [
+                      "job.tar"
+              ]
+      )
 
-            def move_files = fs(
-                name: "move_files",
-                ok: "join_flow",
-                error: "fail",
-                delete: ["hdfs://foo:9000/usr/tucu/temp-data"],
-                mkdir: ['archives/${wf:id()}'],
-                move: [ fsMove( source: '${jobInput}', target: 'archives/${wf:id()}/processed-input' ),
-                        fsMove( source: '${jobInput}', target: 'archives/${wf:id()}/raw-input' ) ],
-                chmod: [fsChmod( path: '${jobOutput}', permissions: '-rwxrw-rw-', dirFiles: true ) ]
-            )
+      def move_files = oozie.fs(
+              name: "move_files",
+              ok: "join_flow",
+              error: "fail",
+              delete: ["hdfs://foo:9000/usr/tucu/temp-data"],
+              mkdir: ['archives/${wf:id()}'],
+              move: [ oozie.fsMove( source: '${jobInput}', target: 'archives/${wf:id()}/processed-input' ),
+                      oozie.fsMove( source: '${jobInput}', target: 'archives/${wf:id()}/raw-input' ) ],
 
-            def mahout_pfpgrowth = java(
-                    name: "mahout_fp_growth",
-                    delete: ["${jobTracker}/pattern"],
-                    mainClass: "some.random.class",
-                    jobXml: "job.xml",
-                    ok: "join_flow",
-                    error: "fail",
-                    configuration: [
-                            "mapred.map.output.compress": "false",
-                            "mapred.job.queue.name": "queuename"
-                    ],
-                    args: [
-                            "--input",
-                            "/cart",
-                            "--output",
-                            "--maxheapSize",
-                            "50"
-                    ]
-            )
+              chmod: [ oozie.fsChmod( path: '${jobOutput}', permissions: '-rwxrw-rw-', dirFiles: true ) ]
+      )
 
-            def fork_flow = fork("fork_flow", [ "move_files", "mahout_fp_growth" ])
+      def mahout_pfpgrowth = oozie.java(
+              name: "mahout_fp_growth",
+              delete: ["${jobTracker}/pattern"],
+              mainClass: "some.random.class",
+              jobXml: "job.xml",
+              ok: "join_flow",
+              error: "fail",
+              configuration: [
+                      "mapred.map.output.compress": "false",
+                      "mapred.job.queue.name": "queuename"
+              ],
+              args: [
+                      "--input",
+                      "/cart",
+                      "--output",
+                      "--maxheapSize",
+                      "50"
+              ])
 
-            def join_flow = join ( "join_flow", "pig_job" )
+      def fork_flow = oozie.fork(
+              name: "fork_flow",
+              paths: [
+                      "move_files",
+                      "mahout_fp_growth"
+              ]
+      )
 
-            def pig_job = pig(
-                    name: "pig_job",
-                    delete: ["${jobTracker}/pattern"],
-                    jobXml: "job.xml",
-                    ok: "hive_job",
-                    error: "fail",
-                    configuration: [
-                            "mapred.map.output.compress": "false",
-                            "mapred.job.queue.name": "queuename"
-                    ],
-                    script: "first.pig",
-                    params: [
-                            "--input",
-                            "/cart",
-                            "--output",
-                            "--maxheapSize",
-                            "50"
-                    ]
-            )
+      def join_flow = oozie.join( name: "join_flow", to: "pig_job" )
 
-            def hive_job = hive(
-                    name: "hive_job",
-                    delete: ["${jobTracker}/pattern"],
-                    jobXml: "job.xml",
-                    ok: "flow_decision",
-                    error: "fail",
-                    configuration: [
-                            "mapred.map.output.compress": "false",
-                            "mapred.job.queue.name": "queuename"
-                    ],
-                    script: "first.hql",
-                    params: [ schema: "standard", otherParam: 'other value' ]
-            )
+      def pig_job = oozie.pig(
+              name: "pig_job",
+              delete: ["${jobTracker}/pattern"],
+              jobXml: "job.xml",
+              ok: "sub_workflow_job",
+              error: "fail",
+              configuration: [
+                      "mapred.map.output.compress": "false",
+                      "mapred.job.queue.name": "queuename"
+              ],
+              script: "first.pig",
+              params: [
+                      "--input",
+                      "/cart",
+                      "--output",
+                      "--maxheapSize",
+                      "50"
+              ])
 
-            def email_job = email(
-                    name: "email_job",
-                    to: "recipient@mail.com",
-                    cc: "also@mail.com",
-                    subject: "vasal",
-                    body: "bow down",
-                    ok: "flow_decision",
-                    error: "fail",
-            )
+      def sub_workflow_job = oozie.subWorkflow(
+        name: "sub_workflow_job",
+        appPath: "hdfs://foo:9000/usr/tucu/temp-data",
+        ok: "hive_job",
+        error: "fail",
+        configuration: [
+            "property.name": "property.value",
+            "property1.name": "property1.value"
+        ]
+      )
 
-            def first_map_reduce = mapReduce(
-                    name: "first_map_reduce",
-                    delete: ["${jobTracker}/pattern"],
-                    jobXml: "job.xml",
-                    ok: "end_node",
-                    error: "fail",
-                    configuration: [
-                            "mapred.map.output.compress": "false",
-                            "mapred.job.queue.name": "queuename"
-                    ]
-            )
+      def hive_job = oozie.hive(
+              name: "hive_job",
+              delete: ["${jobTracker}/pattern"],
+              jobXml: "job.xml",
+              ok: "authenticated_hive_job",
+              error: "fail",
+              configuration: [
+                      "mapred.map.output.compress": "false",
+                      "mapred.job.queue.name": "queuename"
+              ],
+              script: "first.hql",
+              params: [ schema: 'standard', otherParam: 'other value' ]
+      )
 
-            def flow_decision = decision(
-                    name: "flow_decision",
-                    cases: [
-                            decisionCase("end_node", "some condition"),
-                            decisionCase("first_map_reduce", "some other condition")
-                    ],
-                    defaultCase: "end_node"
-            )
+      def authenticated_hive_job = oozie.hive(
+              name: "authenticated_hive_job",
+              cred: "hive_credentials",
+              delete: ["${jobTracker}/pattern"],
+              jobXml: "job.xml",
+              ok: "flow_decision",
+              error: "fail",
+              configuration: [
+                      "mapred.map.output.compress": "false",
+                      "mapred.job.queue.name": "queuename"
+              ],
+              script: "first.hql",
+              params: [ schema: 'standard', otherParam: 'other value' ]
+      )
 
-            def fail = kill(name: "fail", message: "workflow failed!")
+      def first_map_reduce = oozie.mapReduce(
+              name: "first_map_reduce",
+              delete: ["${jobTracker}/pattern"],
+              jobXml: "job.xml",
+              ok: "end_node",
+              error: "fail",
+              configuration: [
+                      "mapred.map.output.compress": "false",
+                      "mapred.job.queue.name": "queuename"
+              ]
+      )
 
-            actions = [
-                    shell_to_prod,
-                    move_files,
-                    mahout_pfpgrowth,
-                    fork_flow,
-                    join_flow,
-                    pig_job,
-                    hive_job,
-                    first_map_reduce,
-                    flow_decision,
-                    fail]
+      def flow_decision = oozie.decision(
+              name: "flow_decision",
+              cases: [ new DecisionCaseNode(to: 'end_node', condition: 'some condition'),
+                       new DecisionCaseNode(to: 'first_map_reduce', condition: 'some other condition'),
+              ],
+              defaultCase: "end_node"
+      )
 
-            common = common_props
-            end = "end_node"
-            name = 'oozie_flow'
-            namespace = 'uri:oozie:workflow:0.1'
-            credentials = [
-              hcatCredentials(
-                name: 'hive_credentials',
-                metastoreUri: "thrift://localhost:9083/",
-                metastorePrincipal: "hive/_HOST@DOMAIN"
-              )
-            ]
+      def fail = oozie.kill(
+              name: "fail",
+              message: "workflow failed!"
+      )
 
-        }
+      task.workflowActions = [shell_to_prod, move_files, mahout_pfpgrowth, fork_flow, join_flow, pig_job, hive_job, authenticated_hive_job, sub_workflow_job, first_map_reduce, flow_decision, fail]
 
-        project.task(TASK_NAME, type: OozieWorkflowTask)
+      task.common = oozie.common(
+        jobTracker: "$jobTracker",
+        nameNode: "$namenode",
+        jobXml: "dev_prop.xml"
+      )
 
-        then:
-        project.extensions.findByName(EXTENSION_NAME) != null
-        Task task = project.tasks.findByName(TASK_NAME)
-        task.end == "end_node"
-        task.workflowName == 'oozie_flow'
-        task.namespace == 'uri:oozie:workflow:0.1'
-        task.common.toMap().size() == 3
-        task.workflowActions.size() == 10
+      task.name = 'oozie_flow'
+      task.namespace = 'uri:oozie:workflow:0.1'
+      task.credentials = [
+        oozie.hcatCredentials(
+          name: 'hive_credentials',
+          metastoreUri: "thrift://localhost:9083/",
+          metastorePrincipal: "hive/_HOST@DOMAIN"
+        )
+      ]
+      task.workflowName = 'oozie_flow'
+      task.end = "end_node"
 
-        and:
-        task.start()
-        def xml=new File("$project.buildDir/oozie_flow.xml")
-        xml.exists()
+      then:
 
+      task.workflowActions.size() == 12
+
+      and:
+      task.start()
+      def xml=new File("$project.buildDir/oozie_flow.xml")
+      xml.exists()
+      def result = xml.readLines().join("")
+      XMLUnit.setIgnoreWhitespace(true)
+      println "expected: ${SAMPLE_XML.EXPECTED_FLOW}"
+      println "actual: ${result}"
+      def xmlDiff = new Diff(result, SAMPLE_XML.EXPECTED_FLOW)
+
+      then:
+      xmlDiff.similar()
     }
 
     def "noncyclic DAG"() {
@@ -320,6 +341,5 @@ class OozieWorkflowPluginSpec extends Specification {
         task.start()
         def xml=new File("$project.buildDir/oozie_flow.xml")
         xml.exists()
-
     }
 }
