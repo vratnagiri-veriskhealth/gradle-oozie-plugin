@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-abstract class WorkflowNode implements Serializable {
+abstract class WorkflowNode extends XmlCapable {
   private static final long serialVersionUID = 1L
 
   String name
@@ -14,8 +14,6 @@ abstract class WorkflowNode implements Serializable {
   public void setName(String name) {
     this.name = NameChecker.verify(name)
   }
-
-  public abstract void buildXml(MarkupBuilder xml, CommonProperties common);
 
   protected Map<String, String> prune(Map<String, String> map) {
     map.findAll { it.value != null }
@@ -27,12 +25,6 @@ abstract class WorkflowNode implements Serializable {
 
   final Map<String, String> toMap() {
     prune(rawMap())
-  }
-
-  protected void addNode(MarkupBuilder xml, String node, String value) {
-    if (value != null) {
-      xml."$node"(value)
-    }
   }
 
   protected void addProperties(MarkupBuilder xml, String nodeName, Map<String, Object> properties) {

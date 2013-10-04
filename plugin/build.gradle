@@ -26,7 +26,6 @@ buildscript {
   }
 }
 
-
 configurations {
     deployerJars
 }

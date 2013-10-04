@@ -31,6 +31,7 @@ class Workflow {
     HashMap<String, Object> jobXML
     List<Map<String, Object>> actions
     Object credentials
+    SlaNode sla
 
     public void setName(String name) {
       this.name = name;

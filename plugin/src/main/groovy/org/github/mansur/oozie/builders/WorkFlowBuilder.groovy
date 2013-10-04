@@ -78,6 +78,9 @@ class WorkFlowBuilder {
                   builder.buildXML(workflow, action, asMap(wf.common))
                 }
             }
+            if (wf.sla != null) {
+              wf.sla.buildXml(workflow, wf.common)
+            }
             end(name: wf.end)
         }
         writer.toString()

@@ -1,24 +1,7 @@
 package org.github.mansur.oozie.extensions
 
 import java.util.Map;
-import org.github.mansur.oozie.beans.CommonProperties
-import org.github.mansur.oozie.beans.DecisionCaseNode
-import org.github.mansur.oozie.beans.DecisionNode
-import org.github.mansur.oozie.beans.EmailNode
-import org.github.mansur.oozie.beans.ForkNode
-import org.github.mansur.oozie.beans.FsChmodNode
-import org.github.mansur.oozie.beans.FsMoveNode
-import org.github.mansur.oozie.beans.FsNode
-import org.github.mansur.oozie.beans.HcatCredentialNode
-import org.github.mansur.oozie.beans.HiveNode
-import org.github.mansur.oozie.beans.SubWorkflowNode
-import org.github.mansur.oozie.beans.JavaNode
-import org.github.mansur.oozie.beans.JoinNode
-import org.github.mansur.oozie.beans.KillNode
-import org.github.mansur.oozie.beans.MapReduceNode
-import org.github.mansur.oozie.beans.PigNode
-import org.github.mansur.oozie.beans.ShellNode
-import org.github.mansur.oozie.beans.SshNode
+import org.github.mansur.oozie.beans.*
 
 /**
  * @author Muhammad Ashraf
@@ -56,4 +39,5 @@ class OozieWorkflowExtension {
     def JoinNode join(String name, String to) { new JoinNode(name: name, to: to) }
     def CommonProperties common(params) { new CommonProperties(params) }
     def HcatCredentialNode hcatCredentials(params) { new HcatCredentialNode(params) }
+    def SlaNode sla(params) { new SlaNode(params) }
 }

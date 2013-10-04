@@ -8,7 +8,7 @@ import static org.junit.Assert.fail;
 class BuilderTestUtils {
 
   static void assertXml(
-    WorkflowNode node, String expectedXml, CommonProperties commonProperties = new CommonProperties()) {
+    XmlCapable node, String expectedXml, CommonProperties commonProperties = new CommonProperties()) {
     def stringWriter = new StringWriter()
     node.buildXml(new MarkupBuilder(new PrintWriter(stringWriter)), commonProperties);
 

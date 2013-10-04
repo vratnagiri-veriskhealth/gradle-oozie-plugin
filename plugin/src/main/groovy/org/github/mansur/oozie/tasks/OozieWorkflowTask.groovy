@@ -1,6 +1,7 @@
 package org.github.mansur.oozie.tasks
 
 import org.github.mansur.oozie.beans.Workflow
+import org.github.mansur.oozie.beans.SlaNode
 import org.github.mansur.oozie.builders.WorkFlowBuilder
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -22,6 +23,7 @@ class OozieWorkflowTask extends DefaultTask {
     @Input List<Object> workflowActions
     @Input @Optional Object credentials = null
     @Input File outputDir = project.buildDir
+    @Input @Optional SlaNode sla = null
 
     OozieWorkflowTask() {
         description = "Generates Ozzie workflow"
@@ -42,6 +44,7 @@ class OozieWorkflowTask extends DefaultTask {
         wf.actions = getWorkflowActions()
         wf.common = getCommon()
         wf.credentials = getCredentials()
+        wf.sla = getSla()
         def builder = new WorkFlowBuilder()
         generateFlow(builder, wf)
         generateJobXML(builder, wf)
