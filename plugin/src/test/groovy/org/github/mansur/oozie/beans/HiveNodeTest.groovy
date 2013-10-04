@@ -10,11 +10,6 @@ class HiveNodeTest extends AbstractHadoopActionNodeTest {
   def hiveArgs = [ script: 'some.hql', params: [a:'b']]
   def args = baseArgs + hiveArgs;
 
-    @Test
-  public void testToMap() {
-    assertEquals(baseResult + hiveArgs + [type: 'hive'], new HiveNode(args).toMap());
-  }
-
   @Test
   public void testBuildXml() {
     assertXml(

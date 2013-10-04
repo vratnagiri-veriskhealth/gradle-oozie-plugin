@@ -9,18 +9,6 @@ class JavaNodeTest extends AbstractHadoopActionNodeTest {
   def args = baseArgs + javaArgs;
 
   @Test
-  public void testToMap() {
-    assertEquals(baseResult + javaArgs + [type: 'java'], new JavaNode(baseArgs + javaArgs).toMap());
-  }
-
-  @Test
-  public void testCaptureOutput() {
-    assertEquals(
-      baseResult + javaArgs + [type: 'java', captureOutput: true],
-      new JavaNode(baseArgs + javaArgs + [captureOutput: true]).toMap());
-  }
-
-  @Test
   public void testBuildXml() {
     assertXml(new JavaNode(args), actionXml("java", "", """
  <main-class>com.example.Main</main-class>

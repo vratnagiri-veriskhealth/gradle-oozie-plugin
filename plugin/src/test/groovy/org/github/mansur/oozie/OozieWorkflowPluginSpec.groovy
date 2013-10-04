@@ -228,12 +228,8 @@ class OozieWorkflowPluginSpec extends Specification {
       xml.exists()
       def result = xml.readLines().join("")
       XMLUnit.setIgnoreWhitespace(true)
-      println "expected: ${SAMPLE_XML.EXPECTED_FLOW}"
-      println "actual: ${result}"
-      def xmlDiff = new Diff(result, SAMPLE_XML.EXPECTED_FLOW)
 
-      then:
-      xmlDiff.similar()
+      BuilderTestUtils.assertXml(SAMPLE_XML.EXPECTED_FLOW, result)
     }
 
     def "noncyclic DAG"() {

@@ -9,20 +9,6 @@ class ShellNodeTest extends AbstractHadoopActionNodeTest {
   def args = baseArgs + shellArgs;
 
   @Test
-  public void testToMap() {
-    assertEquals(
-      baseResult + [ exec: '/bin/ls', args: ['/foo', '/bar'], envVar: ['a=b'], type: 'shell'],
-      new ShellNode(args).toMap());
-  }
-
-  @Test
-  public void testCapture() {
-    assertEquals(
-        baseResult + [ exec: '/bin/ls', args: ['/foo', '/bar'], envVar: ['a=b'], type: 'shell', captureOutput: true ],
-        new ShellNode(args + [captureOutput: true]).toMap());
-  }
-
-  @Test
   public void testBuildXml() {
     assertXml(
       new ShellNode(args),

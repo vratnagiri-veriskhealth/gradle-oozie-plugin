@@ -8,13 +8,6 @@ import static BuilderTestUtils.assertXml
 class ForkNodeTest {
 
   @Test
-  public void testToMap() {
-    assertEquals(
-      [name: 'myFork', type: 'fork', paths: ['p1', 'p2']],
-      new ForkNode([name: 'myFork', paths: ['p1', 'p2']]).toMap())
-  }
-
-  @Test
   public void testBuildXml() {
     assertXml(
       new ForkNode([name: 'myFork', paths: ['p1', 'p2']]),

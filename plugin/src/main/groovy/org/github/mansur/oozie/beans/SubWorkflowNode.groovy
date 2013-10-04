@@ -2,8 +2,6 @@ package org.github.mansur.oozie.beans
 
 import groovy.xml.MarkupBuilder;
 
-import java.util.Map
-
 class SubWorkflowNode extends ActionNode {
   private static final long serialVersionUID = 1L
 
@@ -11,11 +9,6 @@ class SubWorkflowNode extends ActionNode {
   Boolean propagateConfiguration
   Map<String, String> configuration
 
-  @Override
-  protected Map<String, String> rawMap() {
-    super.rawMap() +
-      [ type: 'sub-workflow', appPath : appPath, propagateConfiguration: propagateConfiguration, configuration: configuration ]
-  }
   @Override
   public void buildXml(MarkupBuilder xml, CommonProperties common) {
     actionXml(xml, common) {

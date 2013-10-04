@@ -10,11 +10,6 @@ class JoinNode extends WorkflowNode {
 
   String to
 
-  @Override
-  protected Map<String, String> rawMap() {
-    return super.rawMap() + [type: 'join', to: to]
-  }
-
   void buildXml(MarkupBuilder xml, CommonProperties common) {
     xml.join(name: name, to: to)
   }

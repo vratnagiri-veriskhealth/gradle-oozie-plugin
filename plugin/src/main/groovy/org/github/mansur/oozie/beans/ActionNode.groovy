@@ -13,9 +13,6 @@ abstract class ActionNode extends WorkflowNode {
   String error
 
   @Override
-  protected Map<String, String> rawMap() {
-    super.rawMap() + [cred: cred, ok: ok, error: error]
-  }
 
   protected void prepareNodes(MarkupBuilder xml, List<String> delete, List<String> mkdir) {
     if ((delete ?: mkdir) != null) {

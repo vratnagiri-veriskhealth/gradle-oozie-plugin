@@ -5,8 +5,4 @@ class FsMoveNode implements Serializable {
 
   String source
   String target
-
-  Map<String, String> toMap() {
-    [source: source, target: target]
-  }
 }

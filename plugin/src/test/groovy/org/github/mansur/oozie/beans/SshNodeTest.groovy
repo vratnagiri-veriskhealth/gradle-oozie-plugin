@@ -8,20 +8,6 @@ class SshNodeTest {
   def args = [name: 'remote', ok: 'next', error: 'fail', host: 'example.com', command: 'ls', args: ['/foo']]
 
   @Test
-  public void testToMap() {
-    assertEquals(
-      [type: 'ssh'] + args,
-      new SshNode(args).toMap())
-  }
-
-  @Test
-  public void testCaptureToMap() {
-    assertEquals(
-      [type: 'ssh', captureOutput: true] + args,
-      new SshNode(args + [captureOutput: true]).toMap())
-  }
-
-  @Test
   public void testBuildXml() {
     assertXml(
       new SshNode(args), """

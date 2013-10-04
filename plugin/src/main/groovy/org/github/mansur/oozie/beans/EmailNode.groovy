@@ -18,10 +18,6 @@ package org.github.mansur.oozie.beans
 
 import groovy.xml.MarkupBuilder;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
-
 /**
  * @author Muhammad Ashraf
  * @since 7/23/13
@@ -33,10 +29,6 @@ class EmailNode extends ActionNode {
   String cc
   String subject
   String body
-
-  protected Map<String, String> rawMap() {
-    super.rawMap() + [ type: 'email', to: to, cc: cc, subject: subject, body:body ]
-  }
 
   @Override
   public void buildXml(MarkupBuilder xml, CommonProperties common) {

@@ -5,8 +5,4 @@ class DecisionCaseNode implements Serializable {
 
   String to
   String condition
-
-  Map<String, String> toMap() {
-    return [to: to, if: condition]
-  }
 }

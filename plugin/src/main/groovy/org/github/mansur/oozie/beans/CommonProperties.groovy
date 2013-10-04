@@ -21,23 +21,4 @@ public class CommonProperties implements Serializable {
   String emailCc
   Boolean propagateConfiguration
   String javaOpts
-
-  final Map<String, String> toMap() {
-    [
-      cred: cred,
-      jobTracker: jobTracker,
-      namenode: nameNode,
-      jobXML: jobXml,
-      error: error,
-      file: file,
-      archive: archive,
-      configuration: configuration,
-      params: params,
-      host: sshHost,
-      to: emailTo,
-      cc: emailCc,
-      propagateConfiguration: propagateConfiguration,
-      javaOpts: javaOpts
-    ].findAll { it.value != null }
-  }
 }

@@ -8,25 +8,6 @@ import static BuilderTestUtils.assertXml
 class FsNodeTest {
 
   @Test
-  public void testToMap() {
-    assertEquals(
-      [ type: 'fs',
-        name: 'fileStuff',
-        delete: ['a', 'b'],
-        mkdir: ['c', 'd'],
-        move: [[source: 'from', target: 'to']],
-        chmod: [[path: 'change', permissions: 'rwx', dir_files: 'true'],
-                [path: 'simple', permissions: '666', dir_files: 'false']]],
-     new FsNode(
-       name: 'fileStuff',
-       delete: ['a', 'b'],
-       mkdir: ['c', 'd'],
-       move: [new FsMoveNode(source: 'from', target: 'to')],
-       chmod: [new FsChmodNode(path: 'change', permissions: 'rwx', dirFiles: true),
-               new FsChmodNode(path: 'simple', permissions: '666')]).toMap())
-  }
-
-  @Test
   public void testBuildXml() {
     assertXml(
       new FsNode(

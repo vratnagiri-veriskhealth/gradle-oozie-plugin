@@ -25,13 +25,6 @@ class SubWorkflowNodeTest {
 """
 
   @Test
-  public void testToMap() {
-    assertEquals(
-      [name: 'callout', ok: 'yes', error: 'no', type: 'sub-workflow', appPath: '/some/path', configuration: [foo: 'bar'] ],
-      NODE.toMap());
-  }
-
-  @Test
   public void testBuildXml() {
     assertXml( NODE, BEGINNING + END)
   }

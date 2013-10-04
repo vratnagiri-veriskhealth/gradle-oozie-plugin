@@ -12,15 +12,19 @@ class BuilderTestUtils {
     def stringWriter = new StringWriter()
     node.buildXml(new MarkupBuilder(new PrintWriter(stringWriter)), commonProperties);
 
+    assertXml(expectedXml, stringWriter.toString())
+  }
+
+  static void assertXml(String expectedXml, String actualXml) {
     XMLUnit.setIgnoreWhitespace(true)
     def xmlDiff = new Diff(
-      expectedXml,
-      stringWriter.toString())
+        expectedXml,
+        actualXml)
     if (!xmlDiff.similar()) {
       println "expected:"
       new XmlNodePrinter(new PrintWriter(System.out)).print(new XmlParser().parseText(expectedXml))
       println "actual:"
-      new XmlNodePrinter(new PrintWriter(System.out)).print(new XmlParser().parseText(stringWriter.toString()))
+      new XmlNodePrinter(new PrintWriter(System.out)).print(new XmlParser().parseText(actualXml))
       fail("xml different: ${xmlDiff}")
     }
   }

@@ -13,14 +13,6 @@ class DecisionNodeTest {
         defaultCase: 'huh?')
 
   @Test
-  public void testToMap() {
-    assertEquals(
-      [type: 'decision', name: 'choose', switch: [[to: 'one', if: 'odd'], [to: 'zero', if: 'even']], default: 'huh?'],
-      node.toMap()
-    )
-  }
-
-  @Test
   public void testBuildXml() {
     assertXml(node, """
   <decision name='choose'>
