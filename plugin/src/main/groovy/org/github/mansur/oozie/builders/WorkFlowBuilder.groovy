@@ -123,7 +123,7 @@ class WorkFlowBuilder {
                     n.addEdge(failNode)
                 }
                 else if (failNodeName != endName) {
-                  throw new IllegalStateException("node " + n.name + " maps fail to non-existant node " + failNodeName);
+                  throw new IllegalStateException("node " + n.name + " maps error to non-existant node " + failNodeName);
                 }
             }
             graph.addNode(n)
