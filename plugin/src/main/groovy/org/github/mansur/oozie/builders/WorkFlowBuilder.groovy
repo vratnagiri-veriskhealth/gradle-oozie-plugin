@@ -171,7 +171,7 @@ class WorkFlowBuilder {
     private void handleFork(ForkNode action, Map<String, DirectedGraph.Node> nodesMap, n) {
         def paths = action.paths
         paths?.each { p ->
-            def toNode = nodesMap.get(p)
+            def toNode = nodesMap.get(p.toString())
             if (toNode != null) {
                 n.addEdge(toNode)
             }
