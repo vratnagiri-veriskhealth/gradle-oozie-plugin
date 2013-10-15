@@ -28,8 +28,11 @@ class OozieWorkflowTask extends DefaultTask {
     @Input @Optional SlaNode sla = null
 
     OozieWorkflowTask() {
-        description = "Generates Ozzie workflow"
         group = "Oozie"
+    }
+
+    String getDescription() {
+      "Generated Oozie workflow ${workflowName}"
     }
 
     @TaskAction
