@@ -16,7 +16,7 @@ public class DirectedGraph {
     private final List<Node> nodes;
 
     public DirectedGraph() {
-        nodes = new ArrayList<Node>();
+        nodes = new ArrayList<>();
     }
 
     public void addNode(final Node node) {
@@ -64,20 +64,20 @@ public class DirectedGraph {
     }
 
     Node findHead() {
-        final LinkedHashSet<Node> nodes = new LinkedHashSet<Node>();
-        for (final Node n : this.nodes) {
-            if (n.inEdges.size() == 0) {
-                nodes.add(n);
-            }
-        }
+      final LinkedHashSet<Node> startNodes = new LinkedHashSet<>();
+      for (final Node n : this.nodes) {
+          if (n.inEdges.size() == 0) {
+            startNodes.add(n);
+          }
+      }
 
-        if (nodes.size() > 1) {
-            throw new IllegalStateException("Multiple Starting nodes Founds!" + nodes.toString());
-        } else if (nodes.isEmpty()) {
-            throw new IllegalStateException("No Starting node Found!");
-        }
+      if (startNodes.size() > 1) {
+        throw new IllegalStateException("Multiple Starting nodes Founds!" + startNodes.toString());
+      } else if (startNodes.isEmpty()) {
+        throw new IllegalStateException("No Starting node Found!");
+      }
 
-        return nodes.iterator().next();
+      return startNodes.iterator().next();
     }
 
     @Override
@@ -95,8 +95,8 @@ public class DirectedGraph {
 
     public static class Node {
         private final String name;
-        private final LinkedHashSet<Edge> inEdges = new LinkedHashSet<Edge>();
-        private final LinkedHashSet<Edge> outEdges = new LinkedHashSet<Edge>();
+        private final LinkedHashSet<Edge> inEdges = new LinkedHashSet<>();
+        private final LinkedHashSet<Edge> outEdges = new LinkedHashSet<>();
 
         public Node(final String name) {
             this.name = name;
@@ -146,11 +146,15 @@ public class DirectedGraph {
 
         @Override
         public boolean equals(final Object obj) {
-            if (obj == null) return false;
-            if (obj.getClass() != this.getClass()) return false;
-            final Edge e = (Edge) obj;
-            return e.from == from && e.to == to;
+          if (obj == null) return false;
+          if (obj.getClass() != this.getClass()) return false;
+          final Edge e = (Edge) obj;
+          return e.from == from && e.to == to;
+        }
+
+        @Override
+        public int hashCode() {
+          return System.identityHashCode(from) * 31 + System.identityHashCode(to);
         }
     }
-
 }
