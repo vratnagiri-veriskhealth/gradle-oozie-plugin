@@ -1,7 +1,6 @@
 package org.github.mansur.oozie.builders;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -21,10 +20,6 @@ public class DirectedGraph {
 
   public void addNode(final Node node) {
     nodes.add(node);
-  }
-
-  public void addNodes(final Node... nodes) {
-    Collections.addAll(this.nodes, nodes);
   }
 
   /**

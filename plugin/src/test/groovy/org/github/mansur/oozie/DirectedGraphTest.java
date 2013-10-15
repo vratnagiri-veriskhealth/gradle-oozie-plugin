@@ -42,9 +42,7 @@ public class DirectedGraphTest {
         node2.addEdge(node3);
         node3.addEdge(node4);
 
-        final DirectedGraph directedGraph = new DirectedGraph();
-        directedGraph.addNodes(node2, node1, node3, node4);
-        final List<DirectedGraph.Node> sortedGraph = directedGraph.tSort();
+        final List<DirectedGraph.Node> sortedGraph = makeGraph(node2, node1, node3, node4).tSort();
         assertThat(sortedGraph).containsExactly(node1, node2, node3, node4);
     }
 
@@ -52,9 +50,7 @@ public class DirectedGraphTest {
     public void testOneNodeFlow() throws Exception {
         final DirectedGraph.Node node1 = new DirectedGraph.Node("node1");
 
-        final DirectedGraph directedGraph = new DirectedGraph();
-        directedGraph.addNodes(node1);
-        final List<DirectedGraph.Node> sortedGraph = directedGraph.tSort();
+        final List<DirectedGraph.Node> sortedGraph = makeGraph(node1).tSort();
         assertThat(sortedGraph).containsExactly(node1);
 
     }
@@ -69,12 +65,7 @@ public class DirectedGraphTest {
         }
         nodes.add(node);
       }
-      DirectedGraph dag = new DirectedGraph();
-      dag.addNode(nodes.get(0));
-      dag.addNode(nodes.get(1));
-      dag.addNode(nodes.get(2));
-      dag.addNode(nodes.get(3));
-      List<Node> sorted = dag.tSort();
+      List<Node> sorted = makeGraph(nodes.get(0), nodes.get(1), nodes.get(2), nodes.get(3)).tSort();
       assertEquals(nodes, sorted);
     }
 
@@ -88,13 +79,7 @@ public class DirectedGraphTest {
       start.addEdge(right);
       left.addEdge(end);
       right.addEdge(end);
-      DirectedGraph dag = new DirectedGraph();
-      dag.addNode(start);
-      dag.addNode(left);
-      dag.addNode(right);
-      dag.addNode(end);
-
-      List<Node> sorted = dag.tSort();
+      List<Node> sorted = makeGraph(start, left, right, end).tSort();
       assertEquals(4, sorted.size());
       assertEquals(start, sorted.get(0));
       assertEquals(end, sorted.get(3));
@@ -109,9 +94,7 @@ public class DirectedGraphTest {
         node2.addEdge(node3);
         node3.addEdge(node4);
 
-        final DirectedGraph directedGraph = new DirectedGraph();
-        directedGraph.addNodes(node2, node1, node3, node4);
-        directedGraph.tSort();
+        makeGraph(node2, node1, node3, node4).tSort();
     }
 
     @Test(expected = IllegalStateException.class)
@@ -123,9 +106,14 @@ public class DirectedGraphTest {
         node2.addEdge(node3);
         node3.addEdge(node2);
 
-        final DirectedGraph directedGraph = new DirectedGraph();
-        directedGraph.addNodes(node2, node1, node3);
-        directedGraph.tSort();
+        makeGraph(node2, node1, node3).tSort();
+    }
 
+    private static DirectedGraph makeGraph(DirectedGraph.Node... nodes) {
+      DirectedGraph graph = new DirectedGraph();
+      for(DirectedGraph.Node node: nodes) {
+        graph.addNode(node);
+      }
+      return graph;
     }
 }
