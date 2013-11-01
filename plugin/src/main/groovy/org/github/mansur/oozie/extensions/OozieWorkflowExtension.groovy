@@ -11,7 +11,7 @@ class OozieWorkflowExtension {
     String name
     String end
     String namespace
-    Object common
+    CommonProperties common
     HashMap<String, Object> jobXML
     List<HashMap<String, Object>> actions
     Object credentials
