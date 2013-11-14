@@ -9,6 +9,7 @@ class FsNode extends ActionNode {
   List<String> mkdir
   List<FsMoveNode> move
   List<FsChmodNode> chmod
+  List<String> touchz
 
   @Override
   public void buildXml(MarkupBuilder xml, CommonProperties common) {
@@ -25,6 +26,7 @@ class FsNode extends ActionNode {
             }
           }
         }
+        touchz?.each { xml.'touchz'(path: it) }
       }
     }
   }
