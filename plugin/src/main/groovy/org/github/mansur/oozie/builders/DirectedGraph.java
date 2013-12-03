@@ -1,7 +1,6 @@
 package org.github.mansur.oozie.builders;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,13 +35,13 @@ public class DirectedGraph {
     if (nodes.isEmpty()) {
       return result;
     }
-    Set<Node> toProcess = new HashSet<>();
+    Set<Node> toProcess = new LinkedHashSet<>();
     toProcess.add(findHead());
     while (!toProcess.isEmpty()) {
       Node n = firstElement(toProcess);
       result.add(n);
       toProcess.remove(n);
-      for (Edge e : new HashSet<>(n.outEdges)) { // avoid concurrent modification exception
+      for (Edge e : new LinkedHashSet<>(n.outEdges)) { // avoid concurrent modification exception
         e.remove();
         if (e.to.inEdges.isEmpty()) {
           toProcess.add(e.to);
