@@ -37,7 +37,7 @@ class WorkFlowBuilder {
         def graph = createDAG(actions, wf.end)
         def writer = new StringWriter()
         def workflow = new MarkupBuilder(writer)
-        workflow.'workflow-app'('xmlns': "$wf.namespace", name: "$wf.name") {
+        workflow.'workflow-app'('xmlns': "$wf.namespace", name: "$wf.workflowName") {
             if (wf.credentials != null && !wf.credentials.isEmpty()) {
               List<CredentialNode> credentialNodes = wf.credentials;
               workflow.'credentials' {

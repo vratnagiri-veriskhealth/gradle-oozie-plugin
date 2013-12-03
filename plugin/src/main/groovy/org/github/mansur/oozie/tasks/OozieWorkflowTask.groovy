@@ -26,13 +26,14 @@ class OozieWorkflowTask extends DefaultTask {
     @Input @Optional List<CredentialNode> credentials = null
     @Input File outputDir = project.buildDir
     @Input @Optional SlaNode sla = null
+    @Input @Optional workflowFileName = null
 
     OozieWorkflowTask() {
         group = "Oozie"
     }
 
     String getDescription() {
-      "Generated Oozie workflow ${workflowName}"
+      "Generate Oozie workflow ${workflowName}"
     }
 
     @TaskAction
@@ -42,31 +43,32 @@ class OozieWorkflowTask extends DefaultTask {
 
     private void generateWorkflow() {
         def builder = new WorkFlowBuilder()
-        generateFlow(builder)
-        generateJobXML(builder)
+        def actualWorkflowFileName = workflowFileName ?: workflowName
+        generateFlow(builder, actualWorkflowFileName)
+        generateJobXML(builder, actualWorkflowFileName)
     }
 
-    private void generateJobXML(WorkFlowBuilder builder) {
+    private void generateJobXML(WorkFlowBuilder builder, String actualWorkflowFileName) {
       if (! jobXML.isEmpty()) {
-        def outputFile = new File(getOutputDir().absolutePath + File.separator + getWorkflowName() + "-config.xml")
+        def outputFile = new File(getOutputDir().absolutePath, actualWorkflowFileName + "-config.xml")
         outputFile.parentFile.mkdirs()
-        println("generating oozie job xml : file://$outputFile")
+        println("generating oozie job xml: file://$outputFile")
         outputFile.write(builder.buildJobXML(jobXML))
       }
     }
 
-    private void generateFlow(WorkFlowBuilder builder) {
-        String xml
+    private void generateFlow(WorkFlowBuilder builder, String actualWorkflowFileName) {
+      String xml
 
-        try {
-            xml = builder.buildWorkflow(this)
-        } catch (Exception e) {
-            throw new GradleException(e.message, e)
-        }
+      try {
+          xml = builder.buildWorkflow(this)
+      } catch (Exception e) {
+          throw new GradleException(e.message, e)
+      }
 
-        def outputFile = new File(getOutputDir().absolutePath + File.separator + getWorkflowName() + ".xml")
-        outputFile.parentFile.mkdirs()
-        println("generating oozie workflow: file://$outputFile")
-        outputFile.write(xml)
+      def outputFile = new File(getOutputDir().absolutePath, actualWorkflowFileName + ".xml")
+      outputFile.parentFile.mkdirs()
+      println("generating oozie workflow: file://$outputFile")
+      outputFile.write(xml)
     }
 }

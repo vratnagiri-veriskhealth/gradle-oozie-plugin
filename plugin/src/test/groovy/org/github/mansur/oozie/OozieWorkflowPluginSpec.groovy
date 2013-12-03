@@ -244,98 +244,135 @@ class OozieWorkflowPluginSpec extends Specification {
 
         when:
         project.apply plugin: 'oozie'
+        def oozie = project.oozie;
 
-        project.oozie {
-            def jobTracker = "http://jobtracker"
-            def namenode = "http://namenode"
+        def jobTracker = "http://jobtracker"
+        def namenode = "http://namenode"
 
-            def common_props = common(
-                    jobTracker: "$jobTracker",
-                    nameNode: "$namenode",
-                    jobXml: "dev_prop.xml"
-            )
+        def common_props = oozie.common(
+                jobTracker: "$jobTracker",
+                nameNode: "$namenode",
+                jobXml: "dev_prop.xml"
+        )
 
-            def flow_decision = decision(
-                    name: "flow_decision",
-                    cases: [ decisionCase("mr1", "some condition"), decisionCase("mr2", "some other condition")],
-                    defaultCase: "mr4"
-            )
+        def flow_decision = oozie.decision(
+                name: "flow_decision",
+                cases: [ oozie.decisionCase("mr1", "some condition"), oozie.decisionCase("mr2", "some other condition")],
+                defaultCase: "mr4"
+        )
 
-            def mr1 = mapReduce(
-                    name: "mr1",
-                    delete: ["${jobTracker}/pattern"],
-                    jobXml: "job.xml",
-                    ok: "mr3",
-                    error: "fail",
-                    configuration: [
-                            "mapred.map.output.compress": "false",
-                            "mapred.job.queue.name": "queuename"
-                    ]
-            )
+        def mr1 = oozie.mapReduce(
+                name: "mr1",
+                delete: ["${jobTracker}/pattern"],
+                jobXml: "job.xml",
+                ok: "mr3",
+                error: "fail",
+                configuration: [
+                        "mapred.map.output.compress": "false",
+                        "mapred.job.queue.name": "queuename"
+                ]
+        )
 
-            def mr2 = mapReduce(
-                    name: "mr2",
-                    delete: ["${jobTracker}/pattern"],
-                    jobXml: "job.xml",
-                    ok: "mr3",
-                    error: "fail",
-                    configuration: [
-                            "mapred.map.output.compress": "false",
-                            "mapred.job.queue.name": "queuename"
-                    ]
-            )
+        def mr2 = oozie.mapReduce(
+                name: "mr2",
+                delete: ["${jobTracker}/pattern"],
+                jobXml: "job.xml",
+                ok: "mr3",
+                error: "fail",
+                configuration: [
+                        "mapred.map.output.compress": "false",
+                        "mapred.job.queue.name": "queuename"
+                ]
+        )
 
-            def mr3 = mapReduce(
-                    name: "mr3",
-                    delete: ["${jobTracker}/pattern"],
-                    jobXml: "job.xml",
-                    ok: "mr4",
-                    error: "fail",
-                    configuration: [
-                            "mapred.map.output.compress": "false",
-                            "mapred.job.queue.name": "queuename"
-                    ]
-            )
+        def mr3 = oozie.mapReduce(
+                name: "mr3",
+                delete: ["${jobTracker}/pattern"],
+                jobXml: "job.xml",
+                ok: "mr4",
+                error: "fail",
+                configuration: [
+                        "mapred.map.output.compress": "false",
+                        "mapred.job.queue.name": "queuename"
+                ]
+        )
 
-            def mr4 = mapReduce(
-                    name: "mr4",
-                    delete: ["${jobTracker}/pattern"],
-                    jobXml: "job.xml",
-                    ok: "end_node",
-                    error: "fail",
-                    configuration: [
-                            "mapred.map.output.compress": "false",
-                            "mapred.job.queue.name": "queuename"
-                    ]
-            )
+        def mr4 = oozie.mapReduce(
+                name: "mr4",
+                delete: ["${jobTracker}/pattern"],
+                jobXml: "job.xml",
+                ok: "end_node",
+                error: "fail",
+                configuration: [
+                        "mapred.map.output.compress": "false",
+                        "mapred.job.queue.name": "queuename"
+                ]
+        )
 
-            def fail = kill(
-                    name: "fail",
-                    message: "workflow failed!"
-            )
+        def fail = oozie.kill(
+                name: "fail",
+                message: "workflow failed!"
+        )
 
 
-            actions = [ flow_decision, mr1, mr2, mr3, mr4, fail ]
-
-            common = common_props
-            end = "end_node"
-            name = 'oozie_flow'
-            namespace = 'uri:oozie:workflow:0.1'
-        }
 
         project.task(TASK_NAME, type: OozieWorkflowTask)
-
+        OozieWorkflowTask task = project.tasks.findByName(TASK_NAME)
+        task.workflowActions = [ flow_decision, mr1, mr2, mr3, mr4, fail ]
+        task.common = common_props
+        task.end = "end_node"
+        task.workflowName = 'oozie_flow'
+        task.namespace = 'uri:oozie:workflow:0.1'
         then:
         project.extensions.findByName(EXTENSION_NAME) != null
-        Task task = project.tasks.findByName(TASK_NAME)
-        task.end == "end_node"
-        task.workflowName == 'oozie_flow'
-        task.namespace == 'uri:oozie:workflow:0.1'
-        task.workflowActions.size() == 6
 
         and:
         task.start()
         def xml=new File("$project.buildDir/oozie_flow.xml")
         xml.exists()
+    }
+
+    def "alternate filename"() {
+      expect:
+      project.tasks.findByName(TASK_NAME) == null
+
+      when:
+      project.apply plugin: 'oozie'
+      project.task(TASK_NAME, type: OozieWorkflowTask)
+      OozieWorkflowTask task = project.tasks.findByName(TASK_NAME)
+
+      def oozie = project.oozie;
+      def jobTracker = "http://jobtracker"
+      def namenode = "http://namenode"
+
+      task.workflowActions = []
+      task.jobXML = ["key" : "value"]
+
+      task.common = oozie.common(
+        jobTracker: "$jobTracker",
+        nameNode: "$namenode",
+        jobXml: "dev_prop.xml"
+      )
+
+      task.name = 'oozie_flow'
+      task.namespace = 'uri:oozie:workflow:0.1'
+
+      task.workflowName = 'oozie_flow'
+      task.workflowFileName = 'otherName'
+      task.end = "end_node"
+
+      then:
+
+      task.start()
+      def xml=new File("$project.buildDir/otherName.xml")
+      xml.exists()
+      def result = xml.readLines().join("")
+      XMLUnit.setIgnoreWhitespace(true)
+      def xmlOut = new XmlParser().parseText(result)
+      println "xmlOut: ${xmlOut.getClass()} ${xmlOut}"
+      and:
+      xmlOut.attribute("name") == "oozie_flow"
+      and:
+      new File("$project.buildDir/otherName-config.xml").exists()
     }
 }

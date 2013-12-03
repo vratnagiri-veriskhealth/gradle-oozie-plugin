@@ -38,7 +38,7 @@ class OozieWorkflowTaskSpec extends Specification {
         then:
         def task = project.tasks.findByName(TASK_NAME)
         task != null
-        task.description == "Generates Ozzie workflow"
+        task.description == "Generate Oozie workflow some_oozie_flow"
         task.workflowName == "some_oozie_flow"
         task.start == "start_node"
         task.end == "end_node"
