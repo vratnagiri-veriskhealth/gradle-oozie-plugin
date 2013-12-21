@@ -7,6 +7,7 @@ import org.github.mansur.oozie.beans.WorkflowNode
 import org.github.mansur.oozie.builders.WorkFlowBuilder
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.file.CopySpec
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
@@ -27,9 +28,14 @@ class OozieWorkflowTask extends DefaultTask {
     @Input File outputDir = project.buildDir
     @Input @Optional SlaNode sla = null
     @Input @Optional workflowFileName = null
+    @Input @Optional CopySpec workflowFiles
 
     OozieWorkflowTask() {
         group = "Oozie"
+    }
+
+    protected CopySpec includeFiles(Closure closure) {
+      workflowFiles = project.copySpec(closure)
     }
 
     String getDescription() {
@@ -39,6 +45,16 @@ class OozieWorkflowTask extends DefaultTask {
     @TaskAction
     void start() {
         generateWorkflow()
+        copyWorfklowFiles()
+    }
+
+    private copyWorfklowFiles() {
+      if (workflowFiles != null) {
+        project.copy {
+          with workflowFiles
+          into outputDir
+        }
+      }
     }
 
     private void generateWorkflow() {

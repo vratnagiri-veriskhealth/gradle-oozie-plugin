@@ -1,14 +1,21 @@
 package org.github.mansur.oozie
 
+import java.nio.file.Files;
+
 import org.github.mansur.oozie.beans.*
 import org.github.mansur.oozie.plugin.OozieWorkflowPlugin
 import org.github.mansur.oozie.tasks.OozieWorkflowTask
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.testfixtures.ProjectBuilder
+
 import spock.lang.Specification
+
+import org.apache.commons.io.FileUtils;
 import org.custommonkey.xmlunit.Diff
 import org.custommonkey.xmlunit.XMLUnit
+
+import com.google.common.base.Charsets;
 
 /**
  * @author Muhammad Ashraf
@@ -374,5 +381,59 @@ class OozieWorkflowPluginSpec extends Specification {
       xmlOut.attribute("name") == "oozie_flow"
       and:
       new File("$project.buildDir/otherName-config.xml").exists()
+    }
+
+    def "workflow files"() {
+      expect:
+      project.tasks.findByName(TASK_NAME) == null
+
+      when:
+      project.apply plugin: 'oozie'
+      project.task(TASK_NAME, type: OozieWorkflowTask)
+      OozieWorkflowTask task = project.tasks.findByName(TASK_NAME)
+      def hqlDir = new File(project.rootDir, "hql")
+      hqlDir.mkdir()
+      Files.write(hqlDir.toPath().resolve("foo.hql"), ['select * from world'], Charsets.UTF_8)
+
+      def oozie = project.oozie;
+      def jobTracker = "http://jobtracker"
+      def namenode = "http://namenode"
+
+      task.workflowActions = []
+      task.jobXML = ["key" : "value"]
+
+      task.common = oozie.common(
+        jobTracker: "$jobTracker",
+        nameNode: "$namenode",
+        jobXml: "dev_prop.xml"
+      )
+
+      task.name = 'oozie_flow'
+      task.namespace = 'uri:oozie:workflow:0.1'
+
+      task.workflowName = 'oozie_flow'
+      task.end = "end_node"
+      task.includeFiles {
+        from "hql"
+        into "sql"
+      }
+      task.outputDir(new File(project.buildDir, "workflow"))
+      then:
+
+      task.start()
+      def xml=new File(task.outputDir, "oozie_flow.xml")
+      xml.exists()
+      def result = xml.readLines().join("")
+      XMLUnit.setIgnoreWhitespace(true)
+      def xmlOut = new XmlParser().parseText(result)
+      println "xmlOut: ${xmlOut.getClass()} ${xmlOut}"
+      and:
+      xmlOut.attribute("name") == "oozie_flow"
+      and:
+      new File(task.outputDir, "oozie_flow-config.xml").exists()
+      def sqlFile = new File(task.outputDir, "sql/foo.hql")
+      sqlFile.exists()
+      Files.readAllLines(sqlFile.toPath(), Charsets.UTF_8) == ["select * from world"]
+
     }
 }
