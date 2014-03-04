@@ -20,6 +20,7 @@ Following workflow actions are supported
 6. [fs](http://oozie.apache.org/docs/3.3.0/WorkflowFunctionalSpec.html#a3.2.4_Fs_HDFS_action)
 7. [shell](http://oozie.apache.org/docs/3.3.0/DG_ShellActionExtension.html)
 8. [sub-workflow](http://oozie.apache.org/docs/3.3.0/WorkflowFunctionalSpec.html#a3.2.6_Sub-workflow_Action)
+9. [distcp] (http://oozie.apache.org/docs/4.0.0/DG_DistCpActionExtension.html)
 
 In addition following decision nodes are also supported
 
