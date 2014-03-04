@@ -40,4 +40,5 @@ class OozieWorkflowExtension {
     def CommonProperties common(params) { new CommonProperties(params) }
     def HcatCredentialNode hcatCredentials(params) { new HcatCredentialNode(params) }
     def SlaNode sla(params) { new SlaNode(params) }
+    def DistCpNode distCp(params) { new DistCpNode(params) }
 }
