@@ -15,16 +15,4 @@ abstract class WorkflowNode extends XmlCapable {
     this.name = NameChecker.verify(name)
   }
 
-  protected void addProperties(MarkupBuilder xml, String nodeName, Map<String, Object> properties) {
-    if (properties != null) {
-      xml."$nodeName" {
-        properties.each { k, v ->
-          xml.property {
-            name(k)
-            value(v)
-          }
-        }
-      }
-    }
-  }
 }

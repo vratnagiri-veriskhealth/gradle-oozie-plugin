@@ -18,11 +18,14 @@ package org.github.mansur.oozie.beans
 
 import groovy.xml.MarkupBuilder;
 
+import org.apache.tools.ant.IntrospectionHelper.AddNestedCreator;
+import static org.github.mansur.oozie.beans.NodeXmlUtils.*;
+
 /**
  * @author Muhammad Ashraf
  * @since 7/23/13
  */
-class EmailNode extends ActionNode {
+final class EmailNode extends ActionNode {
   private static final long serialVersionUID = 1L
 
   String to
@@ -31,11 +34,11 @@ class EmailNode extends ActionNode {
   String body
 
   @Override
-  public void buildXml(MarkupBuilder xml, CommonProperties common) {
-    actionXml(xml, common) {
+  public void buildXml(MarkupBuilder xml) {
+    actionXml(xml) {
       xml.'email'(xmlns:"uri:oozie:email-action:0.1") {
-        addNode(xml, 'to', to ?: common.emailTo)
-        addNode(xml, 'cc', cc ?: common.emailCc)
+        addNode(xml, 'to', to)
+        addNode(xml, 'cc', cc)
         addNode(xml, 'subject', subject)
         addNode(xml, 'body', body)
       }

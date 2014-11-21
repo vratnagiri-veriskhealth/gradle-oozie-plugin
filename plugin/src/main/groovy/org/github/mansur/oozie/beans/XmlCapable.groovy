@@ -8,11 +8,7 @@ import java.io.Serializable;
 abstract class XmlCapable implements Serializable {
   private static final long serialVersionUID = 1L
 
-  public abstract void buildXml(MarkupBuilder xml, CommonProperties common);
+  public abstract void buildXml(MarkupBuilder xml);
 
-  protected void addNode(MarkupBuilder xml, String node, String value) {
-    if (value != null) {
-      xml."$node"(value)
-    }
-  }
+  
 }

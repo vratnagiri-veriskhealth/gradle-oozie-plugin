@@ -9,8 +9,8 @@ class AbstractHadoopActionNodeTest {
   [
     name: 'myAction',
     cred: 'trust me',
-    ok: 'next',
-    error: 'ack!!',
+    ok: 'okEnd',
+    error: 'errorEnd',
     jobTracker: 'the job tracker',
     delete: ['a', 'b'],
     mkdir: ['make me'],
@@ -48,8 +48,8 @@ class AbstractHadoopActionNodeTest {
         an archive
       </archive>
     </${actionName}>
-    <ok to='next' />
-    <error to='ack!!' />
+    <ok to='okEnd' />
+    <error to='errorEnd' />
   </action>
 """
 

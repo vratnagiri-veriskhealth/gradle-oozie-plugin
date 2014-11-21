@@ -14,13 +14,4 @@ class MapReduceNodeTest extends AbstractHadoopActionNodeTest {
       actionXml("map-reduce", "", ""))
   }
 
-  @Test
-  public void testBuildXmlWithCommonProps() {
-    assertXml(
-        new MapReduceNode(baseArgs - [cred: baseArgs['cred'], error: baseArgs['error']]),
-        actionXml("map-reduce", "", ""),
-        new CommonProperties(cred: baseArgs['cred'], error: baseArgs['error']))
-  }
-
-
 }

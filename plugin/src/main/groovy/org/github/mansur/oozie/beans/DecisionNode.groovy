@@ -1,22 +1,24 @@
 package org.github.mansur.oozie.beans
 
+import java.util.Map;
+
 import groovy.xml.MarkupBuilder;
 
-class DecisionNode extends WorkflowNode {
-  private static final long serialVersionUID = 1L
+final class DecisionNode extends WorkflowNode {
+	private static final long serialVersionUID = 1L;
 
-  List<DecisionCaseNode> cases;
-  String defaultCase;
+	Map<String,String> decisions;
+	String defaultDecision;
 
-  @Override
-  public void buildXml(MarkupBuilder xml, CommonProperties common) {
-    xml.decision(name: name) {
-      'switch' {
-        cases.each { c ->
-          xml.case(to: c.to, c.condition)
-        }
-        xml.'default'(to: defaultCase)
-      }
-    }
-  }
+	@Override
+	public void buildXml(MarkupBuilder xml) {
+		xml.decision(name: name) {
+			'switch' {
+				decisions.each { k,v ->
+					xml.'case'(to: v, k)
+				}
+				xml.'default'(to: defaultDecision)
+			}
+		}
+	}
 }
