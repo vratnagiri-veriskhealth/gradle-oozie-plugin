@@ -1,0 +1,94 @@
+<workflow-app xmlns='uri:oozie:workflow:0.5' name='oozie_flow'>
+  <start to='flow_decision' />
+  <decision name='flow_decision'>
+    <switch>
+      <case to='mr1'>some condition</case>
+      <case to='mr2'>some other condition</case>
+      <default to='mr4' />
+    </switch>
+  </decision>
+  <action name='mr1'>
+    <map-reduce>
+      <prepare>
+        <delete path='http://jobtracker/pattern' />
+      </prepare>
+      <job-xml>job.xml</job-xml>
+      <configuration>
+        <property>
+          <name>mapred.map.output.compress</name>
+          <value>false</value>
+        </property>
+        <property>
+          <name>mapred.job.queue.name</name>
+          <value>queuename</value>
+        </property>
+      </configuration>
+    </map-reduce>
+    <ok to='mr3' />
+    <error to='fail' />
+  </action>
+  <action name='mr2'>
+    <map-reduce>
+      <prepare>
+        <delete path='http://jobtracker/pattern' />
+      </prepare>
+      <job-xml>job.xml</job-xml>
+      <configuration>
+        <property>
+          <name>mapred.map.output.compress</name>
+          <value>false</value>
+        </property>
+        <property>
+          <name>mapred.job.queue.name</name>
+          <value>queuename</value>
+        </property>
+      </configuration>
+    </map-reduce>
+    <ok to='mr3' />
+    <error to='fail' />
+  </action>
+  <action name='mr3'>
+    <map-reduce>
+      <prepare>
+        <delete path='http://jobtracker/pattern' />
+      </prepare>
+      <job-xml>job.xml</job-xml>
+      <configuration>
+        <property>
+          <name>mapred.map.output.compress</name>
+          <value>false</value>
+        </property>
+        <property>
+          <name>mapred.job.queue.name</name>
+          <value>queuename</value>
+        </property>
+      </configuration>
+    </map-reduce>
+    <ok to='mr4' />
+    <error to='fail' />
+  </action>
+  <action name='mr4'>
+    <map-reduce>
+      <prepare>
+        <delete path='http://jobtracker/pattern' />
+      </prepare>
+      <job-xml>job.xml</job-xml>
+      <configuration>
+        <property>
+          <name>mapred.map.output.compress</name>
+          <value>false</value>
+        </property>
+        <property>
+          <name>mapred.job.queue.name</name>
+          <value>queuename</value>
+        </property>
+      </configuration>
+    </map-reduce>
+    <ok to='end' />
+    <error to='fail' />
+  </action>
+  <kill name='fail'>
+    <message>workflow failed!</message>
+  </kill>
+  <end name='end' />
+</workflow-app>

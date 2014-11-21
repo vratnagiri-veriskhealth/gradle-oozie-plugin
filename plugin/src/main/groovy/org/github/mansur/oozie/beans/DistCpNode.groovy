@@ -1,8 +1,9 @@
 package org.github.mansur.oozie.beans
 
 import groovy.xml.MarkupBuilder;
+import static org.github.mansur.oozie.beans.NodeXmlUtils.*;
 
-class DistCpNode extends ActionNode {
+final class DistCpNode extends ActionNode {
   private static final long serialVersionUID = 1L
 
   String jobTracker
@@ -11,13 +12,13 @@ class DistCpNode extends ActionNode {
   Boolean captureOutput
 
   @Override
-  public void buildXml(MarkupBuilder xml, CommonProperties common) {
-    actionXml(xml, common) {
+  public void buildXml(MarkupBuilder xml) {
+    actionXml(xml) {
       xml.'distcp'(xmlns:"uri:oozie:distcp-action:0.2") {
         xml.'job-tracker'(jobTracker)
         xml.'name-node'(nameNode)
         args?.each { xml.'args'(it) }
-        CapturingUtils.captureOutputNode(xml, captureOutput)
+        addBooleanEmptyNode(xml,'capture-output', captureOutput)
       }
     }
   }

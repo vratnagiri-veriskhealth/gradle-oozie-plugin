@@ -3,6 +3,7 @@ package org.github.mansur.oozie.beans;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+
 import static BuilderTestUtils.assertXml
 
 class FsNodeTest {
@@ -17,8 +18,8 @@ class FsNodeTest {
         move: [new FsMoveNode(source: 'from', target: 'to')],
         chmod: [new FsChmodNode(path: 'change', permissions: 'rwx', recursive: true),
                 new FsChmodNode(path: 'simple', permissions: '666', dirFiles: true)],
-        ok: 'next',
-        error: 'fail'),
+        ok: 'okEnd',
+        error: 'errorEnd'),
       """
   <action name='fileStuff'>
     <fs>
@@ -30,8 +31,8 @@ class FsNodeTest {
       <chmod path='change' permissions='rwx' dir-files='false'><recursive /></chmod>
       <chmod path='simple' permissions='666' dir-files='true' />
     </fs>
-    <ok to='next' />
-    <error to='fail' />
+    <ok to='okEnd' />
+    <error to='errorEnd' />
   </action>
 """
       )
