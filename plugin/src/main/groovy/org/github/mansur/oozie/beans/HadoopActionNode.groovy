@@ -29,5 +29,4 @@ abstract class HadoopActionNode extends ActionNode {
 	  file?.each { xml.file(it) }
 	  archive?.each { xml.archive(it) }
   }
-  
 }

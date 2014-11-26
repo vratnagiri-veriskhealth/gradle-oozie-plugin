@@ -30,12 +30,12 @@ class OozieWorkflowTask extends DefaultTask {
     }
 
     String getDescription() {
-      "Generate Oozie workflow ${extension.name}"
+      "Generate Oozie workflow"
     }
 
     @TaskAction
     void start() {
-		extension.fixExtension()
+		//extension.fixExtension()
         generateWorkflow()
         copyWorfklowFiles()
     }
@@ -69,6 +69,7 @@ class OozieWorkflowTask extends DefaultTask {
       String xml
 
 	  try {
+		  assert extension,"extension is null"
           xml = builder.buildWorkflow(extension)
       } catch (Exception e) {
           throw new GradleException(e.message, e)

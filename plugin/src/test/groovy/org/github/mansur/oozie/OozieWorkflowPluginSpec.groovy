@@ -3,6 +3,7 @@ package org.github.mansur.oozie
 import java.nio.file.Files;
 
 import org.github.mansur.oozie.beans.*
+import org.github.mansur.oozie.extensions.OozieWorkflowExtension
 import org.github.mansur.oozie.plugin.OozieWorkflowPlugin
 import org.github.mansur.oozie.tasks.OozieWorkflowTask
 import org.gradle.api.Project
@@ -46,7 +47,7 @@ class OozieWorkflowPluginSpec extends Specification {
 		def namenode = "http://namenode"
 
 		oozie.start='shell_to_prod'
-		oozie.global = oozie.global{
+		oozie.global{
 			[jobTracker: "$jobTracker",
 				nameNode: "$namenode",
 				jobXml: "dev_prop.xml"]
@@ -106,7 +107,7 @@ class OozieWorkflowPluginSpec extends Specification {
 		}
 
 		def fork_flow = oozie.forkJoin{
-			def move_files = oozie.fs{
+			def move_files = fs{
 				[name: "move_files",
 					ok: "fork_flow",
 					error: "fail",
@@ -122,10 +123,10 @@ class OozieWorkflowPluginSpec extends Specification {
 					chmod: [
 						[ path: '${jobOutput}', permissions: '-rwxrw-rw-', dirFiles: true ]
 					]
-					]
+				]
 			}
 
-			def mahout_pfpgrowth = oozie.java{
+			def mahout_pfpgrowth = java{
 				[name: "mahout_fp_growth",
 					delete: ["${jobTracker}/pattern"],
 					mainClass: "some.random.class",
@@ -145,25 +146,21 @@ class OozieWorkflowPluginSpec extends Specification {
 					]]
 			}
 			[name: "fork_flow",
-				actions: [
-					move_files,
-					mahout_pfpgrowth
-				],
 				to:"pig_job"
 			]
 		}
 
 		/*def sub_workflow_job = oozie.subWorkflow{
-			[name: "sub_workflow_job",
-				appPath: "hdfs://foo:9000/usr/tucu/temp-data",
-				ok: "hive_job",
-				error: "fail",
-				configuration: [
-					"property.name": "property.value",
-					"property1.name": "property1.value"
-				]]
-		}
-*/
+		 [name: "sub_workflow_job",
+		 appPath: "hdfs://foo:9000/usr/tucu/temp-data",
+		 ok: "hive_job",
+		 error: "fail",
+		 configuration: [
+		 "property.name": "property.value",
+		 "property1.name": "property1.value"
+		 ]]
+		 }
+		 */
 		def hive_job = oozie.hive{
 			[name: "hive_job",
 				delete: ["${jobTracker}/pattern"],
@@ -222,34 +219,129 @@ class OozieWorkflowPluginSpec extends Specification {
 				message: "workflow failed!"]
 		}
 
-		oozie.actions = [
-			shell_to_prod,
-			fork_flow,
-			pig_job,
-			hive_job,
-			authenticated_hive_job,
-			first_map_reduce,
-			flow_decision,
-			fail
-		]
+		authenticated_hive_job >> first_map_reduce;
 
-		oozie.name = 'oozie_flow'
-		oozie.credentials = [
-			oozie.hcatCredentials{
-				[name: 'hive_credentials',
-					metastoreUri: "thrift://localhost:9083/",
-					metastorePrincipal: "hive/_HOST@DOMAIN"
-				]
-			}
-		]
-		
+		/*oozie.actions = [
+		 shell_to_prod,
+		 fork_flow,
+		 pig_job,
+		 hive_job,
+		 authenticated_hive_job,
+		 first_map_reduce,
+		 flow_decision,
+		 fail
+		 ]*/
+
+		oozie.name 'oozie_flow'
+
+		oozie.start 'blahblah'
+		/*oozie.credentials = [
+		 oozie.hcatCredentials{
+		 [name: 'hive_credentials',
+		 metastoreUri: "thrift://localhost:9083/",
+		 metastorePrincipal: "hive/_HOST@DOMAIN"
+		 ]
+		 }
+		 ]*/
+
 		oozie.outputDir=new File("$project.buildDir")
-		
+
 		then:
 
-		task.extension.actions.size() == 8
+		task.extension.getActions().size() == 8
 
 		and:
+		task.start()
+		def xml=new File("$project.buildDir/oozie_flow/workflow.xml")
+		xml.exists()
+		def result = xml.readLines().join("")
+		XMLUnit.setIgnoreWhitespace(true)
+
+		BuilderTestUtils.assertXml(SAMPLE_XML.EXPECTED_FLOW, result)
+	}
+
+	def "oozie sample"(){
+		expect:
+		project.tasks.findByName(TASK_NAME) == null
+
+		when:
+		project.apply plugin: 'oozie'
+		project.task(TASK_NAME, type: OozieWorkflowTask)
+		OozieWorkflowTask task = project.tasks.findByName(TASK_NAME)
+
+		def oozie = project.oozie;
+		def String jobTrack="http://jobtracker";
+
+		oozie.global{
+			jobTracker "http://jobtracker"
+			nameNode "http://namenode"
+			configuration{
+				["mapred.map.output.compress": "false",
+					"mapred.job.queue.name": "queuename"]
+			}
+		}
+
+		def mr=oozie.mapReduce{
+			name "first_map_reduce"
+			delete (["${jobTrack}/pattern"])
+			configuration{
+				[
+					"mapred.map.output.compress": "false",
+					"mapred.job.queue.name": "queuename"
+				]
+			}
+		} 
+		def fr=oozie.forkJoin{
+			name "forkjoin"
+			startActions ([
+				"map_reduce_fork1_1",
+				"map_reduce_fork2_1"
+			]);
+			
+			def mr11=mapReduce{
+				name "map_reduce_fork1_1"
+				delete (["${jobTrack}/pattern"])
+				configuration{
+					[
+						"mapred.map.output.compress": "false",
+						"mapred.job.queue.name": "queuename"
+					]
+				}
+			} 
+			def mr12 =mapReduce{
+				name "map_reduce_fork1_2"
+				delete (["${jobTrack}/pattern"])
+				configuration{
+					[
+						"mapred.map.output.compress": "false",
+						"mapred.job.queue.name": "queuename"
+					]
+				}
+			}
+			def mr21=mapReduce{
+				name "map_reduce_fork2_1"
+				delete (["${jobTrack}/pattern"])
+				configuration{
+					[
+						"mapred.map.output.compress": "false",
+						"mapred.job.queue.name": "queuename"
+					]
+				}
+			}
+			mr11>>mr12
+			
+		}
+		def ed=oozie.end("end")
+		mr>>fr>>ed
+		oozie.name 'oozie_flow'
+		oozie.start "first_map_reduce"
+		oozie.fail "fail"
+		oozie.outputDir = project.file("$project.buildDir")
+		then:
+
+		//task.extension.getActions().size() == 8
+
+		//and:
 		task.start()
 		def xml=new File("$project.buildDir/oozie_flow/workflow.xml")
 		xml.exists()
@@ -280,11 +372,11 @@ class OozieWorkflowPluginSpec extends Specification {
 		def namenode = "http://namenode"
 
 		oozie.global = oozie.global{
-				[jobTracker: "$jobTracker",
+			[jobTracker: "$jobTracker",
 				nameNode: "$namenode",
 				jobXml: "dev_prop.xml"
-				]
-				}
+			]
+		}
 
 		def flow_decision = oozie.decision{
 			[name: "flow_decision",
@@ -364,7 +456,7 @@ class OozieWorkflowPluginSpec extends Specification {
 		oozie.outputDir=new File("$project.buildDir")
 
 		then:
-			project.extensions.findByName(EXTENSION_NAME) != null
+		project.extensions.findByName(EXTENSION_NAME) != null
 
 		and:
 		task.start()

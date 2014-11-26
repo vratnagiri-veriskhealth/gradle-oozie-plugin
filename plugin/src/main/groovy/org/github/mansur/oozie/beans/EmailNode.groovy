@@ -19,6 +19,7 @@ package org.github.mansur.oozie.beans
 import groovy.xml.MarkupBuilder;
 
 import org.apache.tools.ant.IntrospectionHelper.AddNestedCreator;
+
 import static org.github.mansur.oozie.beans.NodeXmlUtils.*;
 
 /**
@@ -44,4 +45,11 @@ final class EmailNode extends ActionNode {
       }
     }
   }
+  @Override
+  public Object invokeMethod(String name, Object args) {
+	return super.invokeMethod(name, args);
+  }
+  
+  
+  
 }

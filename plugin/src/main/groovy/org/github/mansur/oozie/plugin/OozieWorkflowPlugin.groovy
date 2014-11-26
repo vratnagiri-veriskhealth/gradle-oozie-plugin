@@ -24,7 +24,7 @@ class OozieWorkflowPlugin implements Plugin<Project> {
     private void addTask(Project project) {
         project.tasks.withType(OozieWorkflowTask).whenTaskAdded { OozieWorkflowTask task ->
             def ext = project.extensions.findByName(EXTENSION_NAME)
-            task.extension = ext
+			task.extension = ext
         }
     }
 }

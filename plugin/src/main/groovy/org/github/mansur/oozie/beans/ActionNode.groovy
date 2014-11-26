@@ -25,4 +25,14 @@ abstract class ActionNode extends WorkflowNode {
 	  }
   }
 
+  public <T extends WorkflowNode> T rightShift(T b){
+	  ok=b.name
+	  return b;
+  }
+  
+  public <T extends WorkflowNode> T xor(T b){
+	  error=b.name
+	  return b;
+  }
+  
 }

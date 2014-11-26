@@ -61,6 +61,7 @@ class WorkFlowBuilder {
 		}
 	}
     def String buildWorkflow(OozieWorkflowExtension wf) {
+		wf.fixActions()
         def actions = wf.actions
 		//def graph = createDAG(actions, wf.end.name)
 		def ActionScope actionScope=[actions:actions]
@@ -111,46 +112,46 @@ class WorkFlowBuilder {
         writer.toString()
     }
 	
-	private void writeActionXml(MarkupBuilder workflow,final ActionScope actionScope){
-		actionScope.actions.each {
-			if(it instanceof ForkJoinNode){
-				WorkflowNode toNode=actionScope.findInThisScope(it.to);
-				assert toNode,"could not find action $it.to in $actionScope.getScopeName() scope for transition from $it.name join"
+	private void writeActionXml(MarkupBuilder workflow, ActionScope actionScope){
+		for(WorkflowNode n : actionScope.actions){
+			if(n instanceof ForkJoinNode){
+				WorkflowNode toNode=actionScope.findInThisScope(n.to);
+				assert toNode,"could not find action $n.to in scope for transition from $n.name join"
 				if(actionScope.isScopeDelimiter(toNode)){
-					it.to+="_join"
+					n.to+="_join"
 				}else if(toNode instanceof ForkJoinNode){
-					it.to+="_fork"
+					n.to+="_fork"
 				}
 				//build fork
-				it.buildXml(workflow)
-				ActionScope subScope=[scopeDelimiter:it,parentScope:actionScope,actions:it.actions]
+				n.buildXml(workflow)
+				ActionScope subScope=[scopeDelimiter:n,parentScope:actionScope,actions:n.actions]
 				writeActionXml(workflow,subScope)
 				//buildJoin
-				it.buildJoinXml(workflow)
-			}else if(it instanceof DecisionNode){
-				it.decisions.each{entry->
+				n.buildJoinXml(workflow)
+			}else if(n instanceof DecisionNode){
+				n.decisions.each{entry->
 					WorkflowNode toNode=actionScope.findInThisScope(entry.value);
-					assert toNode, "could not find action $entry.value in $actionScope.getScopeName() scope for conditional transition from $it.name decision with $k"
+					assert toNode, "could not find action $entry.value in $actionScope.getScopeName() scope for conditional transition from $n.name decision with $entry.key"
 					if(actionScope.isScopeDelimiter(toNode)){
 						entry.value+="_join"
 					}else if(toNode instanceof ForkJoinNode){
 						entry.value+="_fork"
 					}
 				}
-				WorkflowNode toNode=actionScope.findInThisScope(it.defaultDecision);
-				assert toNode, "could not find action $v in $actionScope.getScopeName() scope for conditional transition from $it.name decision with default condition"
+				WorkflowNode toNode=actionScope.findInThisScope(n.defaultDecision);
+				assert toNode, "could not find action $n.defaultDecision in $actionScope.getScopeName() scope for conditional transition from $n.name decision with default condition"
 				if(actionScope.isScopeDelimiter(toNode)){
-					it.defaultDecision+="_join"
+					n.defaultDecision+="_join"
 				}else if(toNode instanceof ForkJoinNode){
-					it.defaultDecision+="_fork"
+					n.defaultDecision+="_fork"
 				}
-				it.buildXml(workflow)
-			}else if(it instanceof KillNode){
-				it.buildXml(workflow)
-			}else if (it instanceof EndNode){
+				n.buildXml(workflow)
+			}else if(n instanceof KillNode){
+				n.buildXml(workflow)
+			}else if (n instanceof EndNode){
 				//do nothing
 			}else{
-				ActionNode actionNode=it
+				ActionNode actionNode=n
 				WorkflowNode okToNode=actionScope.findInThisScope(actionNode.ok)
 				assert okToNode, "could not find action $actionNode.ok in ${actionScope.scopeDelimiter==null?'root':actionScope.scopeDelimiter.name} scope for ok transition from $actionNode.name"
 				if(actionScope.isScopeDelimiter(okToNode)){
@@ -160,11 +161,6 @@ class WorkFlowBuilder {
 				}
 				WorkflowNode errorToNode=actionScope.findVisibleInThisScope(actionNode.error)
 				assert errorToNode, "could not find action $actionNode.error in $actionScope.getScopeName() scope for error transition from $actionNode.name"
-				if(actionScope.isScopeDelimiter(okToNode)){
-					actionNode.error+="_join"
-				}else if(okToNode instanceof ForkJoinNode){
-					actionNode.error+="_fork"
-				}				
 				actionNode.buildXml(workflow);
 			}
 		}
