@@ -9,36 +9,106 @@ import org.github.mansur.oozie.beans.*
  */
 class OozieWorkflowExtension {
     String name
-    String end
-    String namespace
-    CommonProperties common
-    HashMap<String, Object> jobXML
-    List<HashMap<String, Object>> actions
-    Object credentials
+	String start
+    EndNode end=[name:"end"]
+	WorkflowNode defaultErrorNode
+    List<WorkflowNode> actions
+	GlobalNode global
+	List<ParameterNode> parameters=new ArrayList<ParameterNode>();
+    List<CredentialNode> credentials
+	SlaNode sla
     File outputDir
+	
+	public void fixActions() {
+		Set<String> set=new HashSet<String>();
+		boolean hasEndNode=false;
+		actions.each{
+			assert !set.contains(it.name), "action with name $it.name is defined more than once"
+			if(it instanceof EndNode){
+				assert !hasEndNode, "workflow can have only one end node."
+				hasEndNode=true
+			}
+			set.add(it.name)
+		}
+		if(!hasEndNode){
+			actions.add(end)
+		}
+		if(defaultErrorNode && !set.contains(defaultErrorNode.name)){
+			actions.add(defaultErrorNode)
+		}
+		fixDefaultTerminalNodes(end,actions)
+	}
+	
+	void fixTerminalNode(WorkflowNode okEndNode,WorkflowNode node){
+		if(node instanceof ActionNode){
+			if(node.ok==null){
+				node.ok=okEndNode
+			}
+			if(node.error==null && defaultErrorNode){
+				node.error=defaultErrorNode;
+			}
+		}else if(node instanceof ForkJoinNode){
+			fixDefaultTerminalNodes(node,node.actions)
+		}
+	}
 
-    def SubWorkflowNode subWorkflow(params) { new SubWorkflowNode(params) }
-    def HiveNode hive(params) { new HiveNode(params) }
-    def PigNode pig(params) { new PigNode(params) }
-    def JavaNode java(params) { new JavaNode(params) }
-    def MapReduceNode mapReduce(params)  { new MapReduceNode(params) }
-    def ShellNode shell(params)  { new ShellNode(params) }
-    def SshNode ssh(params)  { new SshNode(params) }
-    def FsNode fs(params) { new FsNode(params) }
-    def FsMoveNode fsMove(params) { new FsMoveNode(params) }
-    def FsChmodNode fsChmod(params) { new FsChmodNode(params) }
-    def EmailNode email(params) { new EmailNode(params) }
-    def KillNode kill(params) { new KillNode(params) }
-    def KillNode kill(String name, String message) { new KillNode(name: name, message: message) }
-    def DecisionCaseNode decisionCase(params) { new DecisionCaseNode(params) }
-    def DecisionCaseNode decisionCase(String to, String condition) { new DecisionCaseNode([to: to, condition: condition]) }
-    def DecisionNode decision(params) { new DecisionNode(params) }
-    def ForkNode fork(params) { new ForkNode(params) }
-    def ForkNode fork(String name, List<String> paths) { new ForkNode(name: name, paths: paths) }
-    def JoinNode join(params) { new JoinNode(params) }
-    def JoinNode join(String name, String to) { new JoinNode(name: name, to: to) }
-    def CommonProperties common(params) { new CommonProperties(params) }
-    def HcatCredentialNode hcatCredentials(params) { new HcatCredentialNode(params) }
-    def SlaNode sla(params) { new SlaNode(params) }
-    def DistCpNode distCp(params) { new DistCpNode(params) }
+	private void fixDefaultTerminalNodes(WorkflowNode okEndNode,List<WorkflowNode> actions) {
+		actions.each{
+			fixTerminalNode(it, okEndNode)
+		}
+	}
+	private void fixParameters() {
+		Set<String> set=new HashSet<String>();
+		parameters.each{
+			assert !set.contains(it.name), "parameter with name $it.name is defined more than once"
+			set.add(it.name)
+		}
+	}
+	private void fixCredentials() {
+		Set<String> set=new HashSet<String>();
+		credentials.each{
+			assert !set.contains(it.name), "credential with name $it.name is defined more than once"
+			set.add(it.name)
+		}
+	}
+	
+	public void fixExtension(){
+		fixActions()
+		fixParameters()
+		fixCredentials()
+	}
+	
+	def GlobalNode global(Closure c){ new GlobalNode(c.call())}
+	
+	def void "parameter declare"(String name, String defaultValue, String description){
+		assert parameters.find {
+			it.name==name
+		} == null, "parameter with name $name was allready declared"
+		parameters.add(new ParameterNode(name:name,defaultValue:defaultValue,description:description))
+	}
+	
+	def String parameter(String name){
+		ParameterNode p=parameters.find {
+			it.name==name
+		}
+		assert p, "parameter $name was not declared"
+		return "\${$name}"
+	}
+	
+	def HiveNode hive(Closure c) { new HiveNode(c.call()) }
+    def PigNode pig(Closure c) { new PigNode(c.call()) }
+    def JavaNode java(Closure c) { new JavaNode(c.call()) }
+    def MapReduceNode mapReduce(Closure c)  { new MapReduceNode(c.call()) }
+    def ShellNode shell(Closure c)  { new ShellNode(c.call()) }
+    def SshNode ssh(Closure c)  { new SshNode(c.call()) }
+    def FsNode fs(Closure c) { new FsNode(c.call()) }
+    def EmailNode email(Closure c) { new EmailNode(c.call()) }
+    def DistCpNode distCp(Closure c) { new DistCpNode(c.call()) }
+
+	def KillNode kill(Closure c) { new KillNode(c.call()) }
+	def DecisionNode decision(Closure c) { new DecisionNode(c.call()) }
+	def ForkJoinNode forkJoin(Closure c) { new ForkJoinNode(c.call()) }
+		
+	def HcatCredentialNode hcatCredentials(Closure c) { new HcatCredentialNode(c.call()) }
+	
 }

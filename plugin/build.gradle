@@ -16,6 +16,7 @@
 apply plugin: "java"
 apply plugin: "groovy"
 apply plugin: 'maven'
+apply plugin: 'eclipse'
 
 group = "org.github.mansur.oozie"
 
@@ -32,13 +33,15 @@ configurations {
 
 repositories {
     mavenCentral()
+	maven
+	{ url "http://oss.sonatype.org/content/repositories/snapshots/"}
 }
 dependencies {
     compile gradleApi()
-    compile localGroovy()
+    compile 'org.codehaus.groovy:groovy-all:2.3.6'
     testCompile 'junit:junit:4.11'
     testCompile "org.easytesting:fest-assert-core:2.0M10",
-    testCompile('org.spockframework:spock-core:0.7-groovy-' + groovy.lang.GroovySystem.getVersion().substring(0,3))
+    testCompile('org.spockframework:spock-core:1.0-groovy-2.3-SNAPSHOT')
     testCompile 'xmlunit:xmlunit:1.4'
 //    deployerJars 'org.apache.maven.wagon:wagon-webdav:1.0-beta-2'
     deployerJars 'org.apache.maven.wagon:wagon-http:2.2'

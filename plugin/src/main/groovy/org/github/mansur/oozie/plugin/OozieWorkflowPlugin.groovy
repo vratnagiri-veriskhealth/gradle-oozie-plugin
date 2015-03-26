@@ -24,14 +24,7 @@ class OozieWorkflowPlugin implements Plugin<Project> {
     private void addTask(Project project) {
         project.tasks.withType(OozieWorkflowTask).whenTaskAdded { OozieWorkflowTask task ->
             def ext = project.extensions.findByName(EXTENSION_NAME)
-            task.conventionMapping.workflowActions = { ext.actions }
-            task.conventionMapping.common = { ext.common == null ? [:] : ext.common }
-            task.conventionMapping.end = { ext.end }
-            task.conventionMapping.workflowName = { ext.name }
-            task.conventionMapping.namespace = { ext.namespace }
-            task.conventionMapping.jobXML = { ext.jobXML == null ? [:] : ext.jobXML }
-            task.conventionMapping.outputDir = { ext.outputDir == null ? project.buildDir : ext.outputDir }
-            task.conventionMapping.credentials = { ext.credentials }
+            task.extension = ext
         }
     }
 }

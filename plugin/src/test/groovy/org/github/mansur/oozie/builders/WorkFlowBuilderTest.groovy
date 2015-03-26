@@ -3,7 +3,6 @@ package org.github.mansur.oozie.builders;
 import org.custommonkey.xmlunit.Diff
 import org.custommonkey.xmlunit.XMLUnit;
 import org.github.mansur.oozie.SAMPLE_XML;
-import org.github.mansur.oozie.beans.CommonProperties
 import org.gradle.api.Project;
 
 import static org.junit.Assert.*;

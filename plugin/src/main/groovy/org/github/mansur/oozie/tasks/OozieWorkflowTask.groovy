@@ -1,10 +1,10 @@
 package org.github.mansur.oozie.tasks
 
-import org.github.mansur.oozie.beans.CommonProperties
 import org.github.mansur.oozie.beans.CredentialNode
 import org.github.mansur.oozie.beans.SlaNode
 import org.github.mansur.oozie.beans.WorkflowNode
 import org.github.mansur.oozie.builders.WorkFlowBuilder
+import org.github.mansur.oozie.extensions.OozieWorkflowExtension
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.CopySpec
@@ -17,17 +17,8 @@ import org.gradle.api.tasks.TaskAction
  * @since 7/27/13
  */
 class OozieWorkflowTask extends DefaultTask {
-
-    @Input String workflowName
-    @Input String end
-    @Input String namespace = 'uri:oozie:workflow:0.1'
-    @Input @Optional CommonProperties common
-    @Input @Optional HashMap<String, Object> jobXML = [:]
-    @Input List<WorkflowNode> workflowActions
-    @Input @Optional List<CredentialNode> credentials = null
-    @Input File outputDir = project.buildDir
-    @Input @Optional SlaNode sla = null
-    @Input @Optional workflowFileName = null
+  
+	OozieWorkflowExtension extension
     @Input @Optional CopySpec workflowFiles
 
     OozieWorkflowTask() {
@@ -39,11 +30,12 @@ class OozieWorkflowTask extends DefaultTask {
     }
 
     String getDescription() {
-      "Generate Oozie workflow ${workflowName}"
+      "Generate Oozie workflow ${extension.name}"
     }
 
     @TaskAction
     void start() {
+		extension.fixExtension()
         generateWorkflow()
         copyWorfklowFiles()
     }
@@ -59,9 +51,9 @@ class OozieWorkflowTask extends DefaultTask {
 
     private void generateWorkflow() {
         def builder = new WorkFlowBuilder()
-        def actualWorkflowFileName = workflowFileName ?: workflowName
-        generateFlow(builder, actualWorkflowFileName)
-        generateJobXML(builder, actualWorkflowFileName)
+		
+        generateFlow(builder)
+        //generateJobXML(builder, actualWorkflowFileName)
     }
 
     private void generateJobXML(WorkFlowBuilder builder, String actualWorkflowFileName) {
@@ -73,16 +65,16 @@ class OozieWorkflowTask extends DefaultTask {
       }
     }
 
-    private void generateFlow(WorkFlowBuilder builder, String actualWorkflowFileName) {
+    private void generateFlow(WorkFlowBuilder builder) {
       String xml
 
-      try {
-          xml = builder.buildWorkflow(this)
+	  try {
+          xml = builder.buildWorkflow(extension)
       } catch (Exception e) {
           throw new GradleException(e.message, e)
       }
 
-      def outputFile = new File(getOutputDir().absolutePath, actualWorkflowFileName + ".xml")
+      def outputFile = new File(extension.getOutputDir().absolutePath, extension.name+"/workflow.xml")
       outputFile.parentFile.mkdirs()
       println("generating oozie workflow: file://$outputFile")
       outputFile.write(xml)

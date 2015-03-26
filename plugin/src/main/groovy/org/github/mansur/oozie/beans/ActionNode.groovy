@@ -1,5 +1,6 @@
 package org.github.mansur.oozie.beans
 
+import groovy.lang.Closure;
 import groovy.xml.MarkupBuilder;
 
 import java.util.HashMap;
@@ -11,32 +12,17 @@ abstract class ActionNode extends WorkflowNode {
   String cred
   String ok
   String error
-
-  @Override
-
-  protected void prepareNodes(MarkupBuilder xml, List<String> delete, List<String> mkdir) {
-    if ((delete ?: mkdir) != null) {
-      xml.prepare {
-        fileWork(xml, delete, mkdir)
-      }
-    }
+  
+  protected void actionXml(MarkupBuilder xml, Closure actionContents) {
+	  Map<String, String> actionAttributes = [name : name];
+	  if (cred != null && cred.length() > 0) {
+		  actionAttributes += [cred: cred];
+	  }
+	  xml.action(actionAttributes) {
+		  actionContents.call()
+		  xml.ok(to: ok)
+		  xml.error(to: error)
+	  }
   }
 
-  protected fileWork(MarkupBuilder xml, List<String> delete, List<String> mkdir) {
-    delete?.each { xml.delete(path: it) }
-    mkdir?.each { xml.mkdir(path: it) }
-  }
-
-  protected void actionXml(MarkupBuilder xml, CommonProperties common, Closure actionContents) {
-    Map<String, String> actionAttributes = [name : name];
-    String cred = this.cred ?: common.cred
-    if (cred != null && cred.length() > 0) {
-      actionAttributes += [cred: cred];
-    }
-    xml.action(actionAttributes) {
-      actionContents.call()
-      xml.ok(to: ok)
-      xml.error(to: error ?: common.error)
-    }
-  }
 }
