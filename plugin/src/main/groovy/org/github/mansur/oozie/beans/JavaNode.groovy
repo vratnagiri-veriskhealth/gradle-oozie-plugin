@@ -1,27 +1,28 @@
 package org.github.mansur.oozie.beans
 
-import groovy.xml.MarkupBuilder
+import java.util.List;
 
-class JavaNode extends HadoopActionNode {
+import groovy.lang.Closure;
+import groovy.xml.MarkupBuilder
+import static org.github.mansur.oozie.beans.NodeXmlUtils.*;
+final class JavaNode extends HadoopActionNode {
   private static final long serialVersionUID = 1L
 
   String mainClass
   String javaOpts
   List<String> args
-
   Boolean captureOutput;
   @Override
-  public void buildXml(MarkupBuilder xml, CommonProperties common) {
-    actionXml(xml, common) {
+  public void buildXml(MarkupBuilder xml) {
+    actionXml(xml) {
       xml.'java' {
-        hadoopActionXml(xml, common) {
+        hadoopActionXml(xml) {
           xml.'main-class'(mainClass)
-          addNode(xml, 'java-opts', javaOpts ?: common.javaOpts)
+          addNode(xml, 'java-opts', javaOpts)
           args?.each { xml.'arg'(it) }
         }
-        CapturingUtils.captureOutputNode(xml, captureOutput)
+        addBooleanEmptyNode(xml,'capture-output', captureOutput)
       }
     }
   }
-
 }

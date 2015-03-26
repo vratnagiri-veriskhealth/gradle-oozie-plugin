@@ -21,24 +21,62 @@ import groovy.xml.MarkupBuilder
 import org.github.mansur.oozie.beans.ActionNode
 import org.github.mansur.oozie.beans.CredentialNode
 import org.github.mansur.oozie.beans.DecisionNode;
-import org.github.mansur.oozie.beans.ForkNode;
-import org.github.mansur.oozie.beans.JoinNode
+import org.github.mansur.oozie.beans.EndNode;
+import org.github.mansur.oozie.beans.ForkJoinNode;
 import org.github.mansur.oozie.beans.KillNode;
 import org.github.mansur.oozie.beans.WorkflowNode
-import org.github.mansur.oozie.tasks.OozieWorkflowTask
+import org.github.mansur.oozie.extensions.OozieWorkflowExtension;
 
 /**
  * @author Muhammad Ashraf
  * @since 7/24/13
  */
 class WorkFlowBuilder {
-    def String buildWorkflow(OozieWorkflowTask wf) {
-        def actions = wf.getWorkflowActions()
-        def graph = createDAG(actions, wf.end)
+	class ActionScope{
+		ForkJoinNode scopeDelimiter;
+		ActionScope parentScope;
+		List<WorkflowNode> actions;				
+		WorkflowNode findInThisScope(String node){
+			def n=actions.find {
+				it.name==node
+			} 
+			if (n){
+				return n;
+			}else if(scopeDelimiter?.name==node){
+				return scopeDelimiter;
+			}
+		}		
+		WorkflowNode findVisibleInThisScope(String node){
+			def n=findInThisScope(node) 
+			if(!n){
+				n=parentScope?.findVisibleInThisScope(node)
+			}
+			return n;
+		}
+		boolean isScopeDelimiter(WorkflowNode node){
+			return node.is(scopeDelimiter)
+		}
+		String getScopeName(){
+			return scopeDelimiter?'root':scopeDelimiter.name
+		}
+	}
+    def String buildWorkflow(OozieWorkflowExtension wf) {
+		wf.fixActions()
+        def actions = wf.actions
+		//def graph = createDAG(actions, wf.end.name)
+		def ActionScope actionScope=[actions:actions]
         def writer = new StringWriter()
         def workflow = new MarkupBuilder(writer)
-        workflow.'workflow-app'('xmlns': "$wf.namespace", name: "$wf.workflowName") {
-            if (wf.credentials != null && !wf.credentials.isEmpty()) {
+        workflow.'workflow-app'(xmlns: "uri:oozie:workflow:0.5", name: "$wf.name") {
+			if(wf.parameters){
+				workflow.'parameters'{
+					wf.parameters.each { 
+						it.buildXml(workflow)
+					}
+				}
+			}
+			wf.global?.buildXml(workflow)
+			if (wf.credentials != null && !wf.credentials.isEmpty()) {
               List<CredentialNode> credentialNodes = wf.credentials;
               workflow.'credentials' {
                 credentialNodes.each { cred ->
@@ -53,17 +91,80 @@ class WorkFlowBuilder {
                 }
               }
             }
-            start(to: actions.isEmpty() ? wf.end : graph.findHead())
-            graph.tSort().each {
-              findAction(it.toString(), actions).buildXml(workflow, wf.common)
-            }
+			WorkflowNode startNode=actionScope.findInThisScope(wf.start)
+			assert startNode, "could not find action $wf.start in $actionScope.getScopeName() scope"
+			if(actionScope.isScopeDelimiter(startNode)){
+				wf.start+="_join"
+			}else if(startNode instanceof ForkJoinNode){
+				wf.start+="_fork"
+			}
+			workflow.start(to: wf.start)
+			writeActionXml(workflow,actionScope)
+//            graph.tSort().each {
+//              findAction(it.toString(), actions).buildXml(workflow)
+//            }
+			
             if (wf.sla != null) {
-              wf.sla.buildXml(workflow, wf.common)
+              wf.sla.buildXml(workflow)
             }
-            end(name: wf.end)
+            wf.end.buildXml(workflow)
         }
         writer.toString()
     }
+	
+	private void writeActionXml(MarkupBuilder workflow, ActionScope actionScope){
+		for(WorkflowNode n : actionScope.actions){
+			if(n instanceof ForkJoinNode){
+				WorkflowNode toNode=actionScope.findInThisScope(n.to);
+				assert toNode,"could not find action $n.to in scope for transition from $n.name join"
+				if(actionScope.isScopeDelimiter(toNode)){
+					n.to+="_join"
+				}else if(toNode instanceof ForkJoinNode){
+					n.to+="_fork"
+				}
+				//build fork
+				n.buildXml(workflow)
+				ActionScope subScope=[scopeDelimiter:n,parentScope:actionScope,actions:n.actions]
+				writeActionXml(workflow,subScope)
+				//buildJoin
+				n.buildJoinXml(workflow)
+			}else if(n instanceof DecisionNode){
+				n.decisions.each{entry->
+					WorkflowNode toNode=actionScope.findInThisScope(entry.value);
+					assert toNode, "could not find action $entry.value in $actionScope.getScopeName() scope for conditional transition from $n.name decision with $entry.key"
+					if(actionScope.isScopeDelimiter(toNode)){
+						entry.value+="_join"
+					}else if(toNode instanceof ForkJoinNode){
+						entry.value+="_fork"
+					}
+				}
+				WorkflowNode toNode=actionScope.findInThisScope(n.defaultDecision);
+				assert toNode, "could not find action $n.defaultDecision in $actionScope.getScopeName() scope for conditional transition from $n.name decision with default condition"
+				if(actionScope.isScopeDelimiter(toNode)){
+					n.defaultDecision+="_join"
+				}else if(toNode instanceof ForkJoinNode){
+					n.defaultDecision+="_fork"
+				}
+				n.buildXml(workflow)
+			}else if(n instanceof KillNode){
+				n.buildXml(workflow)
+			}else if (n instanceof EndNode){
+				//do nothing
+			}else{
+				ActionNode actionNode=n
+				WorkflowNode okToNode=actionScope.findInThisScope(actionNode.ok)
+				assert okToNode, "could not find action $actionNode.ok in ${actionScope.scopeDelimiter==null?'root':actionScope.scopeDelimiter.name} scope for ok transition from $actionNode.name"
+				if(actionScope.isScopeDelimiter(okToNode)){
+					actionNode.ok+="_join"
+				}else if(okToNode instanceof ForkJoinNode){
+					actionNode.ok+="_fork"
+				}
+				WorkflowNode errorToNode=actionScope.findVisibleInThisScope(actionNode.error)
+				assert errorToNode, "could not find action $actionNode.error in $actionScope.getScopeName() scope for error transition from $actionNode.name"
+				actionNode.buildXml(workflow);
+			}
+		}
+	}
 
     def String buildJobXML(HashMap<String, Object> props) {
         String result = null;
@@ -88,7 +189,7 @@ class WorkFlowBuilder {
      * @param actions
      * @return
      */
-    private DirectedGraph createDAG(List<WorkflowNode> actions, String endName) {
+    private static DirectedGraph createDAG(List<WorkflowNode> actions, String endName) {
         def graph = new DirectedGraph();
         Map<String, DirectedGraph.Node> nodesMap = getNodeMap(actions)
         def nodes = nodesMap.values()
@@ -98,16 +199,13 @@ class WorkFlowBuilder {
               return;
             }
             def workflowNode = findAction(nodeName, actions)
-            if (workflowNode instanceof ForkNode) {
-                handleFork(workflowNode, nodesMap, n)
-            } else if (workflowNode instanceof JoinNode) {
-                handleJoin(workflowNode, nodesMap, n, endName)
+            if (workflowNode instanceof ForkJoinNode) {
+                handleForkJoin(workflowNode, nodesMap, n)
             } else if (workflowNode instanceof DecisionNode) {
                 handleDecision(workflowNode, nodesMap, n, endName)
             } else if (workflowNode instanceof KillNode) {
               // You can check in any time, but you can never leave
-            }
-            else {
+            } else {
                 def action = (ActionNode) workflowNode
                 def okNodeName = action.ok
                 def okNode = nodesMap.get(okNodeName)
@@ -156,19 +254,7 @@ class WorkFlowBuilder {
         }
     }
 
-    private void handleJoin(
-      JoinNode action, Map<String, DirectedGraph.Node> nodesMap, DirectedGraph.Node n, String endName) {
-        def to = action.to
-        def toNode = nodesMap.get(to)
-        if (toNode != null) {
-            n.addEdge(toNode)
-        }
-        else if (to != endName) {
-          throw new IllegalStateException("join node " + n.name + " forwards to non-existant node " + to);
-        }
-    }
-
-    private void handleFork(ForkNode action, Map<String, DirectedGraph.Node> nodesMap, n) {
+    private void handleForkJoin(ForkJoinNode action, Map<String, DirectedGraph.Node> nodesMap, n) {
         def paths = action.paths
         paths?.each { p ->
             def toNode = nodesMap.get(p.toString())
@@ -183,14 +269,6 @@ class WorkFlowBuilder {
 
     private Object findAction(String name, List<Object> actions) {
         actions.find { name == it.name }
-    }
-
-    def Object findBuilder(String type) {
-        def builder = registry.get(type)
-        if (builder == null) {
-            throw new IllegalArgumentException(String.format("Invalid action type %s, supported action types are %s", type, registry.keySet().toString()))
-        }
-        builder
     }
 
     private HashMap<String, DirectedGraph.Node> getNodeMap(List<Object> actions) {

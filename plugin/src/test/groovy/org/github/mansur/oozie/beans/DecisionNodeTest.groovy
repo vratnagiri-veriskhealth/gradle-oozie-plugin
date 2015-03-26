@@ -6,11 +6,14 @@ import static BuilderTestUtils.assertXml
 import org.junit.Test;
 
 class DecisionNodeTest {
-  private final static DecisionNode node = new DecisionNode(
+	EndNode alt1=[name:"one"]
+	EndNode alt2=[name:"zero"]
+	EndNode nothing=[name:"nothing"]
+  private final DecisionNode node = new DecisionNode(
         name: 'choose',
-        cases: [ new DecisionCaseNode(to: 'one', condition: 'odd'),
-                 new DecisionCaseNode(to: 'zero', condition: 'even') ],
-        defaultCase: 'huh?')
+        decisions: [ 'odd':'one',
+			         'even':'zero' ],
+        defaultDecision: 'nothing')
 
   @Test
   public void testBuildXml() {
@@ -19,7 +22,7 @@ class DecisionNodeTest {
     <switch>
       <case to='one'>odd</case>
       <case to='zero'>even</case>
-      <default to="huh?"/>
+      <default to="nothing"/>
     </switch>
   </decision>
 """)

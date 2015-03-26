@@ -6,7 +6,7 @@ package org.github.mansur.oozie
  */
 class SAMPLE_XML {
     def static EXPECTED_FLOW = """
-<workflow-app xmlns='uri:oozie:workflow:0.1' name='oozie_flow'>
+<workflow-app xmlns='uri:oozie:workflow:0.5' name='oozie_flow'>
   <credentials>
     <credential name='hive_credentials' type='hcat'>
       <property>

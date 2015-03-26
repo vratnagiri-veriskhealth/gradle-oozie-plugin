@@ -1,6 +1,11 @@
 package org.github.mansur.oozie.beans
 
+import java.util.List;
+import java.util.Map;
+
+import groovy.lang.Closure;
 import groovy.xml.MarkupBuilder;
+import static org.github.mansur.oozie.beans.NodeXmlUtils.*;
 
 abstract class HadoopActionNode extends ActionNode {
   private static final long serialVersionUID = 1L
@@ -14,14 +19,14 @@ abstract class HadoopActionNode extends ActionNode {
   List<String> archive
   Map<String, String> configuration
 
-  protected void hadoopActionXml(MarkupBuilder xml, CommonProperties common, Closure actionSpecific) {
-    xml.'job-tracker'(jobTracker ?: common.jobTracker)
-    xml.'name-node'(nameNode ?: common.nameNode)
-    prepareNodes(xml, delete, mkdir)
-    xml.'job-xml'(jobXml ?: common.jobXml)
-    addProperties(xml, 'configuration', configuration ?: common.configuration)
-    actionSpecific.call()
-    (file ?: common.file)?.each { xml.file(it) }
-    (archive ?: common.archive)?.each { xml.archive(it) }
+  protected void hadoopActionXml(MarkupBuilder xml, Closure actionSpecific) {
+	  addNode(xml, 'job-tracker', jobTracker)
+	  addNode(xml, 'name-node', nameNode)
+	  prepareNodes(xml, delete, mkdir)
+	  addNode(xml, 'job-xml', jobXml)
+	  addProperties(xml, 'configuration', configuration)
+	  actionSpecific.call()
+	  file?.each { xml.file(it) }
+	  archive?.each { xml.archive(it) }
   }
 }
